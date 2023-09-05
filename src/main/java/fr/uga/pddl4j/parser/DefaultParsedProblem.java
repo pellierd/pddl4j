@@ -1222,13 +1222,16 @@ public class DefaultParsedProblem implements ParsedDomain, ParsedProblem {
                 str.append(p.getName());
                 str.append("\n");
                 str.append("  :parameters (");
-                for (int i = 0; i < p.getArguments().size() - 1; i++) {
-                    str.append(p.getArguments().get(i)).append(" ");
+                if (p.getArguments().isEmpty()) {
+                    str.append(")");
+                } else {
+                    for (int i = 0; i < p.getArguments().size() - 1; i++) {
+                        str.append(p.getArguments().get(i)).append(" ");
+                    }
+                    str.append(p.getArguments().get(p.getArguments().size() - 1));
+                    str.append(")");
                 }
-                if (!p.getArguments().isEmpty()) {
-                    str.append(p.getArguments().get(p.getArguments().size() - 1).toString());
-                }
-                str.append(")\n");
+                str.append(" )\n\n");
             }
         }
         if (this.constraints != null) {
