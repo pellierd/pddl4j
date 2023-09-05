@@ -40,6 +40,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -1597,10 +1598,15 @@ public final class Parser implements Callable<Integer> {
      * @return <code>true</code> if this task was previously declared; <code>false</code> otherwise.
      */
     private boolean isDeclaredTask(NamedTypedList task) {
+        // Add the primitive task to the set of tasks of the domain
+        List<NamedTypedList> tasks = new ArrayList<>(this.domain.getTasks());
+        for (ParsedAction a : this.domain.getActions()) {
+            tasks.add(a.toTask());
+        }
         boolean checked = false;
         int i = 0;
-        while (i < this.domain.getTasks().size() && !checked) {
-            NamedTypedList t = this.domain.getTasks().get(i);
+        while (i < tasks.size() && !checked) {
+            NamedTypedList t = tasks.get(i);
             if (task.getName().equals(t.getName())
                 && task.getArguments().size() == t.getArguments().size()) {
                 int j = 0;

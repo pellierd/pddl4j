@@ -188,11 +188,11 @@ public class NamedTypedList implements Serializable {
         if (!this.types.isEmpty()) {
             str.append(" - ");
             if (this.types.size() == 1) {
-                str.append(this.types.get(0).toString().toUpperCase(Locale.ENGLISH));
+                str.append(this.types.get(0).toString());
             } else if (this.types.size() == 2) {
                 str.append("(either");
                 this.types.stream().filter(type -> !type.equals(Symbol.OBJECT_TYPE))
-                    .forEach(type -> str.append(" ").append(type.toString().toUpperCase(Locale.ENGLISH)));
+                    .forEach(type -> str.append(" ").append(type.toString()));
                 str.append(")");
             }
         }

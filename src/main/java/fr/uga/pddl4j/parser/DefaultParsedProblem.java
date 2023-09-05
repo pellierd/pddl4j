@@ -401,7 +401,6 @@ public class DefaultParsedProblem implements ParsedDomain, ParsedProblem {
      * @return <code>true</code> if the action was added; <code>false</code> otherwise.
      */
     public final boolean addAction(final ParsedAction action) {
-        this.tasks.add(action.toTask());
         return this.actions.add(action);
     }
 

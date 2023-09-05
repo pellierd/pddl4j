@@ -18,6 +18,7 @@ package fr.uga.pddl4j.problem;
 import fr.uga.pddl4j.parser.DefaultParsedProblem;
 import fr.uga.pddl4j.parser.ErrorManager;
 import fr.uga.pddl4j.parser.Expression;
+import fr.uga.pddl4j.parser.ParsedAction;
 import fr.uga.pddl4j.parser.Parser;
 import fr.uga.pddl4j.parser.RequireKey;
 import fr.uga.pddl4j.problem.numeric.NumericVariable;
@@ -101,10 +102,19 @@ public class DefaultProblem extends FinalizedProblem {
         // Collect the requirements of the problem.
         this.initRequirements();
 
+        // Add the primitive actions of the domain as primitive task of the domain
+        if (this.getRequirements().contains(RequireKey.HIERARCHY)) {
+            for (ParsedAction a : this.getParsedProblem().getActions()) {
+                this.getParsedProblem().getTasks().add(a.toTask());
+            }
+        }
+
         // Collect the information on the type declared in the domain
         this.initTypes();
+
         // Collect the constants (symbols and types) declared in the domain
         this.initConstants();
+
         // Collect the either types of the domain
         this.initEitherTypes();
         if (LOGGER.isDebugEnabled()) {

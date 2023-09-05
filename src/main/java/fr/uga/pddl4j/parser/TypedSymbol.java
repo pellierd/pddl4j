@@ -105,12 +105,12 @@ public class TypedSymbol<T> extends Symbol<T> {
         if (!this.getTypes().isEmpty()) {
             str.append(" - ");
             if (this.getTypes().size() == 1) {
-                str.append(this.getTypes().get(0).toString().toUpperCase(Locale.ENGLISH));
+                str.append(this.getTypes().get(0).toString());
             } else if (this.getTypes().size() == 2) {
                 str.append("(either");
                 for (int i = 0; i < this.getTypes().size(); i++) {
                     str.append(" ");
-                    str.append(this.getTypes().get(i).toString().toUpperCase(Locale.ENGLISH));
+                    str.append(this.getTypes().get(i).toString());
                 }
                 str.append(")");
             }
