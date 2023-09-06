@@ -383,13 +383,13 @@ Token left_bracket() :
 ParsedDomain domain() :
 {
 	Expression<String> exp = null;
-	Symbol<String> name = null;
+	Symbol<String> domain = null;
 }
 {
 	try {
 		<LEFT_BRACKET> <DEFINE> <LEFT_BRACKET> <DOMAIN>
-			name=domain_name() {
-				this.domain = new DefaultParsedProblem(name);
+			domain=domain_name() {
+				this.domain = new DefaultParsedProblem(domain);
 			}
 		right_bracket()
 		[LOOKAHEAD(2) require_def(Lexer.PARSER_DOMAIN)]
@@ -417,13 +417,13 @@ ParsedDomain domain() :
 ParsedProblem domain_and_problem() :
 {
 	Expression<String> exp = null;
-	Symbol<String> name = null;
+	Symbol<String> domain = null;
 }
 {
 	try {
     	<LEFT_BRACKET> <DEFINE> <LEFT_BRACKET> <DOMAIN>
-            name=domain_name() {
-                this.domain = new DefaultParsedProblem(name);
+            domain=domain_name() {
+                this.domain = new DefaultParsedProblem(domain);
             }
         <RIGHT_BRACKET>
         [LOOKAHEAD(2) require_def(Lexer.PARSER_DOMAIN)]
@@ -4445,18 +4445,18 @@ ParsedProblem problem() :
 
 ParsedProblem pddl_problem() :
 {
-	Symbol<String> name;
+	Symbol<String> problem;
 	Symbol<String> domain;
 }
 {
 	try {
 		<LEFT_BRACKET> <DEFINE>
 		<LEFT_BRACKET> <PROBLEM>
-			name=problem_name()
+			problem=problem_name()
 		<RIGHT_BRACKET>
 		<LEFT_BRACKET> <P_DOMAIN>
 			domain = domain_problem_name() {
-                this.problem = new DefaultParsedProblem(name, domain);
+                this.problem = new DefaultParsedProblem(domain, problem);
             }
 		<RIGHT_BRACKET>
 		[LOOKAHEAD(2) require_def(Lexer.PARSER_PROBLEM)]
@@ -4478,7 +4478,7 @@ ParsedProblem pddl_problem() :
 
 ParsedProblem htn_problem() : // ADD HDDL
 {
-	Symbol<String> name;
+	Symbol<String> problem;
 	Symbol<String> domain;
 	ParsedTaskNetwork taskNetwork;
 	List<TypedSymbol<String>> parameters = new ArrayList<TypedSymbol<String>>();
@@ -4487,11 +4487,11 @@ ParsedProblem htn_problem() : // ADD HDDL
 	try {
 		<LEFT_BRACKET> <DEFINE>
 		<LEFT_BRACKET> <PROBLEM>
-			name=problem_name()
+			problem=problem_name()
 		<RIGHT_BRACKET>
 		<LEFT_BRACKET> <P_DOMAIN>
 			domain = domain_problem_name() {
-			    this.problem = new DefaultParsedProblem(name, domain);
+			    this.problem = new DefaultParsedProblem(domain, problem);
 		    }
 
 		<RIGHT_BRACKET>
