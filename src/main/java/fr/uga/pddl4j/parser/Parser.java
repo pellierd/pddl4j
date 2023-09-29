@@ -352,7 +352,7 @@ public final class Parser implements Callable<Integer> {
             e.printStackTrace();
             return null;
         }
-        if (this.problem == null) {
+        if (this.problem == null || this.domain == null) {
             return null;
         }
         this.checkDomainName();
