@@ -19,6 +19,7 @@
 
 package fr.uga.pddl4j.problem;
 
+import fr.uga.pddl4j.problem.operator.Action;
 import fr.uga.pddl4j.problem.operator.Condition;
 import fr.uga.pddl4j.problem.operator.ConditionalEffect;
 import fr.uga.pddl4j.problem.operator.Effect;
@@ -64,7 +65,7 @@ public class State extends BitVector {
     }
 
     /**
-     * Creates a new state from an other state. This constructor is the copy constructor.
+     * Creates a new state from another state. This constructor is the copy constructor.
      *
      * @param state the other state to copy.
      */
@@ -74,8 +75,8 @@ public class State extends BitVector {
     }
 
     /**
-     * Applies a specified state to this state. In other word, the positive facts of
-     * the specified state are added to this state and the negative ones are delete.
+     * Applies a specified state to this state. In other word, the positive fluents of
+     * the specified state are added to this state and the negative ones are deleted.
      *
      * @param state the state to apply.
      */
@@ -94,8 +95,8 @@ public class State extends BitVector {
     }
 
     /**
-     * Applies a conditional effects to this state. In other word, the positive fluent of the specified effects are
-     * added to this state and the negative ones are delete. The state is modified if and only if the condition of the
+     * Applies a conditional effects to this state. In other word, the positive fluents of the specified effects are
+     * added to this state and the negative ones are deleted. The state is modified if and only if the condition of the
      * conditional effects hold in the state, otherwise the state stay unchanged.
      *
      * @param effects the expression to apply.
@@ -103,6 +104,19 @@ public class State extends BitVector {
     public final void apply(final ConditionalEffect effects) {
         if (this.satisfy(effects.getCondition())) {
             this.apply(effects.getEffect());
+        }
+    }
+
+    /**
+     * Applies an action to this state. In other word, the positive fluents of the effects of the specified action are
+     * added to this state and the negative ones are deleted. The state is modified if and only if the condition of the
+     * conditional effects hold in the state, otherwise the state stay unchanged.
+     *
+     * @param action the action to apply in this state
+     */
+    public final void apply(final Action action) {
+        if (this.satisfy(action.getPrecondition())) {
+            this.apply(action.getConditionalEffects());
         }
     }
 
