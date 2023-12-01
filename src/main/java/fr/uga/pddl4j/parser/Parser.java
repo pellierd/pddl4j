@@ -289,7 +289,7 @@ public final class Parser implements Callable<Integer> {
         if (this.domain == null) {
             return null;
         }
-        this.checkRequirements();
+        this.checkDomainRequirements();
         this.checkTypesDeclaration();
         this.checkConstantsDeclaration();
         this.checkPredicatesDeclaration();
@@ -323,8 +323,20 @@ public final class Parser implements Callable<Integer> {
      * @throws FileNotFoundException if the specified problem file does not exist.
      */
     public ParsedProblem parseProblem(File problem) throws FileNotFoundException {
+        return this.parseProblem(problem, new HashSet<>(), new HashSet<>());
+    }
+
+    /**
+     * Parses a planning problem from a specific file.
+     *
+     * @param problem the file that contains the planning problem.
+     * @return a the pddl problem parsed or null if a lexical error or parser error occurred.
+     * @throws FileNotFoundException if the specified problem file does not exist.
+     */
+    private ParsedProblem parseProblem(File problem, Set<RequireKey> declared, Set<RequireKey> needed)
+            throws FileNotFoundException {
         this.problemFile = problem;
-        return this.parseProblem();
+        return this.parseProblem(declared, needed);
     }
 
     /**
@@ -334,6 +346,16 @@ public final class Parser implements Callable<Integer> {
      * @throws FileNotFoundException if the specified problem file does not exist.
      */
     public ParsedProblem parseProblem() throws FileNotFoundException {
+        return this.parseProblem(new HashSet<>(), new HashSet<>());
+    }
+
+    /**
+     * Parses a planning problem from a specific file.
+     *
+     * @return the pddl problem parsed or null if a lexical error or parser error occurred.
+     * @throws FileNotFoundException if the specified problem file does not exist.
+     */
+    private ParsedProblem parseProblem(Set<RequireKey> declared, Set<RequireKey> needed) throws FileNotFoundException {
         if (!this.getProblemFile().exists()) {
             throw new FileNotFoundException("File  \"" + this.getProblemFile().getName() + "\" does not exist.\n");
         }
@@ -356,7 +378,7 @@ public final class Parser implements Callable<Integer> {
             return null;
         }
         this.checkDomainName();
-        this.checkRequirements();
+        this.checkProblemRequirements(declared, needed);
         this.checkObjectsDeclaration();
         this.checkInitialTaskNetwork();
         this.checkInitialState();
@@ -368,64 +390,9 @@ public final class Parser implements Callable<Integer> {
     }
 
     /**
-     * Parses a planning domain and a planning problem from the specified file path.
-     *
-     * @param domainAndProblem the path to the file that contains the planning domain and problem.
-     * @return the problem parsed.
-     * @throws FileNotFoundException if the specified file does not exist.
-     */
-    public DefaultParsedProblem parseDomainAndProblem(String domainAndProblem) throws FileNotFoundException {
-        return this.parseDomainAndProblem(new File(domainAndProblem));
-    }
-
-    /**
-     * Parses a planning domain and a planning problem from the specified file.
-     *
-     * @param domainAndProblem the file that contains the planning domain and problem.
-     * @return the problem parsed.
-     * @throws FileNotFoundException if the specified file does not exist.
-     */
-    public DefaultParsedProblem parseDomainAndProblem(File domainAndProblem) throws FileNotFoundException {
-        if (!domainAndProblem.exists()) {
-            throw new FileNotFoundException("File  \"" + domainAndProblem.getName() + "\" does not exist.\n");
-        }
-        this.lexer = new Lexer(new FileInputStream(domainAndProblem));
-        lexer.setErrorManager(this.mgr);
-        lexer.setFile(domainAndProblem);
-        try {
-            this.lexer.domain_and_problem();
-        } catch (ParseException e) {
-            e.printStackTrace();
-            return null;
-        }
-        if (this.domain == null || this.problem == null) {
-            return null;
-        }
-        this.domain = this.lexer.getDomain();
-        this.problem = this.lexer.getProblem();
-        this.checkRequirements();
-        this.checkTypesDeclaration();
-        this.checkConstantsDeclaration();
-        this.checkPredicatesDeclaration();
-        this.checkFunctionsDeclaration();
-        this.checkTaskDeclaration();
-        this.checkActionDeclaration();
-        this.checkMethodDeclaration();
-        this.checkDerivedPredicateDeclaration();
-        this.checkDomainName();
-        this.checkObjectsDeclaration();
-        this.checkInitialTaskNetwork();
-        this.checkInitialState();
-        this.checkGoal();
-        this.checkProblemConstraints();
-        this.checkMetric();
-        return new DefaultParsedProblem(this.getDomain(), this.getProblem());
-    }
-
-    /**
      * Parses a planning domain and a planning problem from their respective string description.
      *
-     * @param domainString  the string that contains the planning domains.
+     * @param domainString  the string that contains the planning domain.
      * @param problemString the string that contains the planning problem.
      * @throws IOException if an error occurs while parsing.
      */
@@ -446,40 +413,9 @@ public final class Parser implements Callable<Integer> {
         }
 
         // Parse and check the domain
-        parseDomain(domainTempFile);
+        this.parseDomain(domainTempFile);
         // Parse and check the problem
-        parseProblem(problemTempFile);
-    }
-
-    /**
-     * Parses a planning domain and a planning problem from their respective string description.
-     *
-     * @param domainAndProblemString the string that contains the domain and planning problem.
-     * @throws IOException if an error occurs while parsing.
-     */
-    public void parseFromString(String domainAndProblemString) throws IOException {
-        // Create temp files for domain and problem
-        File domainAndProblemTempFile = File.createTempFile("domainAndProblemString", ".pddl");
-
-        // Fill files with string content
-        try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(
-            new FileOutputStream(domainAndProblemTempFile), "UTF-8"))) {
-            writer.write(domainAndProblemString);
-        }
-
-        // Parse and check the domain and problem
-        parse(domainAndProblemTempFile);
-    }
-
-    /**
-     * Parses a planning domain and a planning problem from an input stream.
-     *
-     * @param inputDomainAndProblem the stream that contains the domain and planning problem.
-     * @throws IOException if an error occurs while parsing.
-     */
-    public void parseFromStream(InputStream inputDomainAndProblem) throws IOException {
-        BufferedReader buffer = new BufferedReader(new InputStreamReader(inputDomainAndProblem, "UTF-8"));
-        parseFromString(buffer.lines().collect(Collectors.joining("\n")));
+        this.parseProblem(problemTempFile);
     }
 
     /**
@@ -494,26 +430,6 @@ public final class Parser implements Callable<Integer> {
         BufferedReader bufferProblem = new BufferedReader(new InputStreamReader(inputProblem, "UTF-8"));
         parseFromString(bufferDomain.lines().collect(Collectors.joining("\n")),
             bufferProblem.lines().collect(Collectors.joining("\n")));
-    }
-
-    /**
-     * Parses a planning domain and a planning problem from a file path.
-     *
-     * @param domainAndProblem the path of the file that contains the planning domain an problem.
-     * @throws FileNotFoundException if the specified domain or problem file does not exist.
-     */
-    public void parse(String domainAndProblem) throws FileNotFoundException {
-        this.parseDomainAndProblem(new File(domainAndProblem));
-    }
-
-    /**
-     * Parses a planning domain and a planning problem from a file.
-     *
-     * @param domainAndProblem the file that contains the planning domain an problem.
-     * @throws FileNotFoundException if the specified domain or problem file does not exist.
-     */
-    public void parse(File domainAndProblem) throws FileNotFoundException {
-        this.parseDomainAndProblem(domainAndProblem);
     }
 
     /**
@@ -546,7 +462,8 @@ public final class Parser implements Callable<Integer> {
         // Parse and check the domain
         ParsedDomain pddlDomain = this.parseDomain(domain);
         // Parse and check the problem
-        ParsedProblem pddlProblem = this.parseProblem(problem);
+        ParsedProblem pddlProblem = this.parseProblem(problem,
+            pddlDomain.getDeclaredRequirements(), pddlDomain.getRequirements());
         return (pddlDomain != null && pddlProblem != null) ? new DefaultParsedProblem(pddlDomain, pddlProblem) : null;
     }
 
@@ -569,18 +486,100 @@ public final class Parser implements Callable<Integer> {
     }
 
     /**
-     * Check if the requirements declared in the domain are consistent. Requirements are consistent iff:
-     *  <ul>
-     *      <li>they do not contain both :partial-ordered-htn and :total-ordered-htn;</li>
-     *      <li>they do not contain :htn-method-precondition with on the total or partial ordered requitrement.</li>
-     *  </ul>
+     * Check if the requirements declared in the domains. Requirements are consistent iff:
+     *  only the requirements declared are really needed to check the syntax.
      *
      * @return <code>true</code> if the requirements declared in the domain are consistent.
      * <code>false</code> otherwise.
      */
-    private boolean checkRequirements() {
-        return (this.getDomain().getRequirements().contains(RequireKey.METHOD_PRECONDITIONS)
-            && !this.getDomain().getRequirements().contains(RequireKey.HIERARCHY));
+    private boolean checkDomainRequirements() {
+        return this.checkRequirements(new HashSet<>(), new HashSet<>(), true);
+    }
+
+    /**
+     * Check if the requirements declared in the problem are consistent. Requirements are consistent iff:
+     * only the requirements declared are really needed to check the syntax.
+     *
+     * @return <code>true</code> if the requirements declared in the domain are consistent.
+     * <code>false</code> otherwise.
+     */
+    private boolean checkProblemRequirements() {
+        return this.checkRequirements(new HashSet<>(), new HashSet<>(), false);
+    }
+
+    /**
+     * Check if the requirements declared in the problem are consistent. Requirements are consistent iff:
+     * only the requirements declared are really needed to check the syntax.
+     *
+     * @param declared the declared requirements of the domain.
+     * @param needed the needed requirements induced after parsing.
+     * @return <code>true</code> if the requirements declared in the domain are consistent.
+     * <code>false</code> otherwise.
+     */
+    private boolean checkProblemRequirements(Set<RequireKey> declared, Set<RequireKey> needed) {
+        return this.checkRequirements(declared, needed, false);
+    }
+
+    /**
+     * Check if the requirements declared in the domain or the problem are consistent. Requirements are consistent iff:
+     * only the requirements declared are really needed to check the syntax.
+     *
+     * @param declared the declared requirements of the domain.
+     * @param needed the needed requirements induced after parsing.
+     * @param isDomain a boolean to indicate if the requirements to check come from the domain or the problem.
+     * @return <code>true</code> if the requirements declared in the domain are consistent.
+     * <code>false</code> otherwise.
+     */
+    private boolean checkRequirements(Set<RequireKey> declared, Set<RequireKey> needed, boolean isDomain) {
+        boolean checked = true;
+        Set<RequireKey> n = null;
+        if (isDomain) {
+            n = new HashSet<>(this.getDomain().getRequirements());
+        } else {
+            n = new HashSet<>(this.getProblem().getRequirements());
+        }
+        n.add(RequireKey.STRIPS);
+        n.addAll(needed);
+        Set<RequireKey> d = null;
+        if (isDomain) {
+            d = new HashSet<>(this.getDomain().getDeclaredRequirements());
+            d.remove(RequireKey.TIMED_INITIAL_LITERALS);
+        } else {
+            d = new HashSet<>(this.getProblem().getDeclaredRequirements());
+        }
+        d.add(RequireKey.STRIPS);
+        d.addAll(declared);
+        if (d.contains(RequireKey.METHOD_PRECONDITIONS) && !d.contains(RequireKey.HIERARCHY)) {
+            this.mgr.logParserWarning(":method-preconditions requirement cannot be used without "
+                    + ":hierarchy requirement.", this.lexer.getFile(),
+                this.getDomain().getDomainName().getLocation().getBeginLine(),
+                this.getDomain().getDomainName().getLocation().getBeginColumn());
+            checked = false;
+        } else if (!d.equals(n)) {
+            StringBuilder str = new StringBuilder();
+            if (!d.containsAll(n)) {
+                str.append("Missing declared requirements:");
+                Set<RequireKey> missing = new HashSet<>(n);
+                missing.removeAll(d);
+                for (RequireKey r : missing) {
+                    str.append(" ");
+                    str.append(r.toString());
+                }
+            } else {
+                str.append("Requirements declared not required:");
+                Set<RequireKey> extra = new HashSet<>(d);
+                extra.removeAll(n);
+                for (RequireKey r : extra) {
+                    str.append(" ");
+                    str.append(r.toString());
+                }
+            }
+            this.mgr.logParserWarning(str.toString(), this.lexer.getFile(),
+                this.getDomain().getDomainName().getLocation().getBeginLine(),
+                this.getDomain().getDomainName().getLocation().getBeginColumn());
+            checked = false;
+        }
+        return checked;
     }
 
     /**

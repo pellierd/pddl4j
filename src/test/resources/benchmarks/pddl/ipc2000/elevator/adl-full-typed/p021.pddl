@@ -5,7 +5,7 @@
    (:domain miconic)
    (:objects p3 - going_down
              p1 - conflict_A
-             p2 p0 p3 p4 - conflict_B
+             p2 p0 p4 - conflict_B
              f0 f1 f2 f3 f4 f5 f6 f7 f8 f9 - floor)
 
 

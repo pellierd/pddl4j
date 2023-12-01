@@ -67,12 +67,27 @@ public interface ParsedProblem extends Serializable {
     Set<RequireKey> getRequirements();
 
     /**
-     * Adds a requirements to the domain.
+     * Adds a requirement to the domain.
      *
      * @param requirement the requirement to add.
      * @return <code>true</code> if the requirement was added; <code>false</code> otherwise.
      */
     boolean addRequirement(final RequireKey requirement);
+
+    /**
+     * Returns the set of declared requirements.
+     *
+     * @return the set of declared requirements.
+     */
+    Set<RequireKey> getDeclaredRequirements();
+
+    /**
+     * Adds a declared requirement to the domain.
+     *
+     * @param requirement the declared requirement to add.
+     * @return <code>true</code> if the rdeclared equirement was added; <code>false</code> otherwise.
+     */
+    boolean addDeclaredRequirement(final RequireKey requirement);
 
     /**
      * Returns the list of objects declared in the problem file.

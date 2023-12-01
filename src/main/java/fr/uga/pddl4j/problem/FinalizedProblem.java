@@ -348,12 +348,17 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
         }
         // Add relevant fluents from the initial state
         for (Expression<Integer> p : this.getIntInitialState()) {
-            Inertia inertia = this.getGroundInertia().get(p);
-            if (inertia == null) {
-                inertia = Inertia.INERTIA;
-            }
-            if (this.getIntInitialState().contains(p) && !inertia.equals(Inertia.NEGATIVE)) {
-                fluents.add(p);
+            if (p.getConnector().equals(Connector.NOT)) {
+                p = p.getChildren().get(0);
+                if (this.getGroundInertia().get(p) == null
+                        || this.getGroundInertia().get(p).equals(Inertia.POSITIVE)) {
+                    fluents.add(p);
+                }
+            } else {
+                if (this.getGroundInertia().get(p) == null
+                        || this.getGroundInertia().get(p).equals(Inertia.NEGATIVE)) {
+                    fluents.add(p);
+                }
             }
         }
         // Add relevant fluents from the goal

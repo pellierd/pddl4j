@@ -1,6 +1,6 @@
 (define
 	(problem p4obs_1sat_3mod)
-	(:domain  satellite2)
+	(:domain satellite2)
 	(:objects
 		instrument0 - instrument
 		instrument1 - instrument
@@ -16,7 +16,7 @@
 		site4 - image_direction
 		site5 - image_direction
 	)
-	(:htn
+	(:durative-htn
 		:parameters ()
 		:subtasks (and
 		 (task0 (do_observation site2 infrared2))

@@ -1202,8 +1202,7 @@ public abstract class AbstractProblem implements Problem {
     /**
      * Encodes an specified expression into its integer representation.
      *
-     * <p>
-     * Notes:
+     * <p>Notes:
      * <ul>
      * <li>equal predicate used specified value of -1.</li>
      * <li>variables used negative values in [-1,-infinity[.</li>

@@ -32,6 +32,7 @@ import fr.uga.pddl4j.parser.Connector;
 import fr.uga.pddl4j.parser.ParsedDerivedPredicate;
 import fr.uga.pddl4j.parser.Parser;
 import fr.uga.pddl4j.parser.Expression;
+import fr.uga.pddl4j.parser.Location;
 import fr.uga.pddl4j.parser.ParsedDomain;
 import fr.uga.pddl4j.parser.ParsedProblem;
 import fr.uga.pddl4j.parser.NamedTypedList;
@@ -60,11 +61,11 @@ public class Lexer {
 	private static final int PARSER_DOMAIN = 5;
 	private static final int PARSER_PROBLEM = 6;
 
-	private ParsedDomain domain = null;
-	public ParsedDomain getDomain() { return this.domain; }
+    private DefaultParsedProblem parsedProblem;
 
-	private ParsedProblem problem = null;
-	public ParsedProblem getProblem() { return this.problem; }
+	public ParsedDomain getDomain() { return this.parsedProblem; }
+
+	public ParsedProblem getProblem() { return this.parsedProblem; }
 
     private File file;
 	public File getFile() { return this.file; }
@@ -101,20 +102,15 @@ public class Lexer {
 	}
 
 	public boolean isRequirement(RequireKey key) {
-		if (domain != null && this.problem != null) {
-			return this.domain.getRequirements().contains(key)
-			|| this.problem.getRequirements().contains(key);
-		} else if (domain != null && this.problem == null) {
-			return this.domain.getRequirements().contains(key);
-		} else if (problem != null && this.domain == null) {
-			return this.problem.getRequirements().contains(key);
+		if (parsedProblem != null) {
+			return this.parsedProblem.getRequirements().contains(key);
 		} else {
 			return false;
 		}
 	}
 
 	public Set<RequireKey> getRequirements() {
-		return this.domain.getRequirements();
+		return this.parsedProblem.getRequirements();
 	}
 
 	private void skipToNextBlock() {
@@ -274,6 +270,7 @@ TOKEN : {
 |	< DURATION_INEQUALITIES : ":duration-inequalities" >
 |	< HIERARCHY : ":hierarchy" > // ADD HDDL
 |	< HTN : ":htn" > // ADD HDDL
+|	< DURATIVE_HTN : ":durative-htn" > // ADD HDDL 2.1
 |   < METHOD_PRECONDITIONS : ":method-preconditions" > // ADD HDDL
 |   < METHOD_CONSTRAINTS : ":method-constraints" > // ADD HDDL2.1
 }
@@ -384,25 +381,31 @@ ParsedDomain domain() :
 {
 	Expression<String> exp = null;
 	Symbol<String> domain = null;
+	Token start = null;
 }
 {
 	try {
 		<LEFT_BRACKET> <DEFINE> <LEFT_BRACKET> <DOMAIN>
 			domain=domain_name() {
-				this.domain = new DefaultParsedProblem(domain);
+				this.parsedProblem = new DefaultParsedProblem(domain);
 			}
 		right_bracket()
 		[LOOKAHEAD(2) require_def(Lexer.PARSER_DOMAIN)]
-		[LOOKAHEAD(2, { this.isRequirement(RequireKey.TYPING)}) type_def() ]
+		[LOOKAHEAD(2) // RequireKey.TYPING
+		    start=type_def() {
+		        this.parsedProblem.addRequirement(RequireKey.TYPING);
+		    }
+		]
 		[LOOKAHEAD(2) constants_def()]
 		[LOOKAHEAD(2) predicates_def()]
-		[LOOKAHEAD(2, {
-			this.isRequirement(RequireKey.FLUENTS)
-			|| this.isRequirement(RequireKey.NUMERIC_FLUENTS)
-			|| this.isRequirement(RequireKey.OBJECT_FLUENTS)
-			|| this.isRequirement(RequireKey.ACTION_COSTS)
-		}) functions_def()]
-		[LOOKAHEAD(2, { this.isRequirement(RequireKey.CONSTRAINTS)}) pddl_const(Lexer.PARSER_DOMAIN)]
+		[LOOKAHEAD(2) functions_def() {
+            this.parsedProblem.addRequirement(RequireKey.NUMERIC_FLUENTS);
+        }]
+		[LOOKAHEAD(2) // RequireKey.CONSTRAINTS
+		    pddl_const(Lexer.PARSER_DOMAIN) {
+                this.parsedProblem.addRequirement(RequireKey.CONSTRAINTS);
+		    }
+	    ]
 		(structure_def())+
 		right_bracket()
 		<EOF>
@@ -410,42 +413,7 @@ ParsedDomain domain() :
 		this.error(e, token.beginLine, token.beginColumn);
 	}
 	{
-	    return this.domain;
-    }
-}
-
-ParsedProblem domain_and_problem() :
-{
-	Expression<String> exp = null;
-	Symbol<String> domain = null;
-}
-{
-	try {
-    	<LEFT_BRACKET> <DEFINE> <LEFT_BRACKET> <DOMAIN>
-            domain=domain_name() {
-                this.domain = new DefaultParsedProblem(domain);
-            }
-        <RIGHT_BRACKET>
-        [LOOKAHEAD(2) require_def(Lexer.PARSER_DOMAIN)]
-        [LOOKAHEAD(2, { this.isRequirement(RequireKey.TYPING)}) type_def() ]
-        [LOOKAHEAD(2) constants_def()]
-        [LOOKAHEAD(2) predicates_def()]
-        [LOOKAHEAD(2, {
-            this.isRequirement(RequireKey.FLUENTS)
-            || this.isRequirement(RequireKey.NUMERIC_FLUENTS)
-            || this.isRequirement(RequireKey.OBJECT_FLUENTS)
-            || this.isRequirement(RequireKey.ACTION_COSTS)
-        }) functions_def()]
-        [LOOKAHEAD(2, { this.isRequirement(RequireKey.CONSTRAINTS)}) pddl_const(Lexer.PARSER_DOMAIN)]
-        (structure_def())+
-        <RIGHT_BRACKET>
-    	//Problem file
-    	problem()
-    } catch(Throwable e) {
-    	this.error(e, token.beginLine, token.beginColumn);
-    }
-    {
-        return new DefaultParsedProblem(this.domain, this.problem);
+	    return this.getDomain();
     }
 }
 
@@ -454,7 +422,7 @@ void require_def(int type) :
 	Token t = null;
 	Set<RequireKey> requirements = null;
 	if (type == Lexer.PARSER_DOMAIN) {
-		this.domain.addRequirement(RequireKey.STRIPS);
+		this.parsedProblem.addDeclaredRequirement(RequireKey.STRIPS);
 	}
 }
 {
@@ -463,11 +431,11 @@ void require_def(int type) :
 			(requirements=require_key() {
 				if (type == Lexer.PARSER_DOMAIN) {
 					for (RequireKey r : requirements) {
-						this.domain.addRequirement(r);
+						this.parsedProblem.addDeclaredRequirement(r);
 					}
 				} else {
 					for (RequireKey r : requirements) {
-						this.problem.addRequirement(r);
+						this.parsedProblem.addDeclaredRequirement(r);
 					}
 				}
 			})+ right_bracket()
@@ -651,7 +619,6 @@ Set<RequireKey> require_key() :
 		}
 	|	<DURATIVE_ACTIONS> {
 			requirements.add(RequireKey.DURATIVE_ACTIONS);
-			requirements.add(RequireKey.DURATION_INEQUALITIES);
 		}
 	|	<DERIVED_PREDICATES> {
 			requirements.add(RequireKey.DERIVED_PREDICATES);
@@ -685,29 +652,32 @@ Set<RequireKey> require_key() :
 }
 
 
-void type_def():
+Token type_def():
 {
 	List<TypedSymbol<String>> typedList = null;
+	Token begin = null;
 }
 {
 	try {
-		left_bracket() <TYPES>
+		begin = left_bracket() <TYPES>
 			typedList=typed_list(Lexer.PRIMITIVE_TYPE)
 		right_bracket()  {
 			for (TypedSymbol<String> type : typedList) {
-				this.domain.addType(type);
+				this.parsedProblem.addType(type);
 			}
-			for (TypedSymbol<String> type : this.domain.getTypes()) {
+			for (TypedSymbol<String> type : this.parsedProblem.getTypes()) {
 				if (type.getTypes().isEmpty()
 				        && !type.equals(Symbol.OBJECT_TYPE)
 				        && !type.equals(Symbol.NUMBER_TYPE)) {
 					type.addType(Symbol.OBJECT_TYPE);
 				}
 			}
+			return begin;
 		}
 	} catch(Throwable e) {
 		this.error(e, token.beginLine, token.beginColumn);
 	}
+
 }
 
 List<TypedSymbol<String>> typed_list(int kind) :
@@ -720,69 +690,41 @@ List<TypedSymbol<String>> typed_list(int kind) :
 }
 {
     (   LOOKAHEAD(2)
-        left_bracket() right_bracket()
-	|   LOOKAHEAD(2, {kind == Lexer.PRIMITIVE_TYPE})
+        left_bracket() right_bracket() {
+            return typedList;
+        }
+    |   LOOKAHEAD(2, {kind == Lexer.PRIMITIVE_TYPE})
 			(t=primitive_type() {
 				tmp.add(t);
 			})*
-			(LOOKAHEAD(1, { this.isRequirement(RequireKey.TYPING)})
-				<SUB> types=type() nextTypedList=typed_list(kind))? {
-				if (types == null) {
-					types = new ArrayList<Symbol<String>>();
-				}
-				for (Symbol<String> s : tmp) {
-					TypedSymbol<String> ts = new TypedSymbol<String>(s);
-					for (Symbol<String> type : types) {
-						ts.addType(type);
-					}
-					typedList.add(ts);
-				}
-				if (nextTypedList != null) {
-					typedList.addAll(nextTypedList);
-				}
-			}
 	|	LOOKAHEAD(2, {kind == Lexer.CONSTANT})
-			(t=constant() {
-				tmp.add(t);
-			})*
-			(LOOKAHEAD(1, { this.isRequirement(RequireKey.TYPING)})
-				<SUB> types=type() nextTypedList=typed_list(kind))? {
-				if (types == null) {
-					types = new ArrayList<Symbol<String>>();
-				}
-				for (Symbol<String> s : tmp) {
-					TypedSymbol<String> ts = new TypedSymbol<String>(s);
-					for (Symbol<String> type : types) {
-						ts.addType(type);
-					}
-					typedList.add(ts);
-				}
-				if (nextTypedList != null) {
-					typedList.addAll(nextTypedList);
-				}
-			}
-	|	LOOKAHEAD(2, {kind == Lexer.VARIABLE})
-			(t=variable() {
-				tmp.add(t);
-			})*
-			(LOOKAHEAD(1, { this.isRequirement(RequireKey.TYPING)})
-				<SUB> types=type() nextTypedList=typed_list(kind))? {
-				if (types == null) {
-					types = new ArrayList<Symbol<String>>();
-					types.add(Symbol.OBJECT_TYPE);
-				}
-				for (Symbol<String> s : tmp) {
-					TypedSymbol<String> ts = new TypedSymbol<String>(s);
-					for (Symbol<String> type : types) {
-						ts.addType(type);
-					}
-					typedList.add(ts);
-				}
-				if (nextTypedList != null) {
-					typedList.addAll(nextTypedList);
-				}
-			}
-	) {
+        		(t=constant() {
+        		    tmp.add(t);
+        		})*
+    |	LOOKAHEAD(2, {kind == Lexer.VARIABLE})
+    			(t=variable() {
+    				tmp.add(t);
+    			})*
+    )
+
+	(LOOKAHEAD(1) <SUB> types=type() {
+	        this.parsedProblem.addRequirement(RequireKey.TYPING);
+	    }
+        nextTypedList=typed_list(kind))? {
+        if (types == null) {
+            types = new ArrayList<Symbol<String>>();
+            types.add(Symbol.OBJECT_TYPE);
+        }
+        for (Symbol<String> s : tmp) {
+            TypedSymbol<String> ts = new TypedSymbol<String>(s);
+            for (Symbol<String> type : types) {
+                ts.addType(type);
+            }
+            typedList.add(ts);
+        }
+        if (nextTypedList != null) {
+            typedList.addAll(nextTypedList);
+        }
 		return typedList;
 	}
 }
@@ -831,7 +773,7 @@ void constants_def() :
 			    if (constant.getTypes().isEmpty()) {
 			    	constant.addType(Symbol.OBJECT_TYPE);
 			    }
-			    this.domain.addConstant(constant);
+			    this.parsedProblem.addConstant(constant);
 			}
 		}
 	} catch(Throwable e) {
@@ -862,7 +804,7 @@ void predicates_def() :
 	try {
 		left_bracket() <PREDICATES>
 			(LOOKAHEAD(2) predicate=atomic_formula_skeleton() {
-				this.domain.addPredicate(predicate);
+				this.parsedProblem.addPredicate(predicate);
 			})+
 		right_bracket()
 	} catch(Throwable e) {
@@ -965,7 +907,7 @@ void functions_def():
 			functions=function_typed_list(Lexer.ATOMIC_FUNCTION_SKELETON)
 		right_bracket() {
 			for (NamedTypedList function: functions) {
-				this.domain.addFunction(function);
+				this.parsedProblem.addFunction(function);
 			}
 		}
 	} catch(Throwable e) {
@@ -1046,17 +988,17 @@ List<Symbol<String>> function_type() :
 	List<Symbol<String>> typesList = new ArrayList<Symbol<String>>();
 }
 {
-		LOOKAHEAD(2, {this.isRequirement(RequireKey.NUMERIC_FLUENTS)
-			|| this.isRequirement(RequireKey.FLUENTS)
-			|| this.isRequirement(RequireKey.ACTION_COSTS)})
-		t=<NUMBER_TYPE> {
-			typesList.add(new Symbol<String>(SymbolType.TYPE, t.image,
-			    t.beginLine, t.beginColumn, t.endLine, t.endColumn));
-			return typesList;
-		}
-	| 	LOOKAHEAD(2, {(this.isRequirement(RequireKey.TYPING) && this.isRequirement(RequireKey.OBJECT_FLUENTS))
-        	                    || this.isRequirement(RequireKey.FLUENTS)})
+		LOOKAHEAD(2) // RequireKey.NUMERIC_FLUENTS
+		    t=<NUMBER_TYPE> {
+			    typesList.add(new Symbol<String>(SymbolType.TYPE, t.image,
+    			    t.beginLine, t.beginColumn, t.endLine, t.endColumn));
+    			this.parsedProblem.addRequirement(RequireKey.NUMERIC_FLUENTS);
+	    		return typesList;
+		    }
+	| 	LOOKAHEAD(2) // RequireKey.TYPING + RequireKey.OBJECT_FLUENTS
 		    typesList=type() {
+		        this.parsedProblem.addRequirement(RequireKey.TYPING);
+		        this.parsedProblem.addRequirement(RequireKey.OBJECT_FLUENTS);
 		        return typesList;
         }
 }
@@ -1338,23 +1280,35 @@ Expression<String> gd() :
 			exp=atomic_formula(Lexer.TERM)
 	|	LOOKAHEAD(2)
 			exp=and_gd()
-	|	LOOKAHEAD(2, {this.isRequirement(RequireKey.DISJUNCTIVE_PRECONDITIONS)})
-			exp=or_gd()
-	|	LOOKAHEAD(2, { this.isRequirement(RequireKey.NEGATIVE_PRECONDITIONS)})
-			exp=not_gd()
-	|	LOOKAHEAD(2, { this.isRequirement(RequireKey.DISJUNCTIVE_PRECONDITIONS)
-				&& this.isRequirement(RequireKey.NEGATIVE_PRECONDITIONS)})
-			exp=imply_gd()
-	|	LOOKAHEAD(2, { this.isRequirement(RequireKey.EXISTENTIAL_PRECONDITIONS)})
-			exp=exists_gd()
-	|	LOOKAHEAD(2, { this.isRequirement(RequireKey.UNIVERSAL_PRECONDITIONS)})
-			exp=forall_gd()
-	| 	LOOKAHEAD(3, { this.isRequirement(RequireKey.EQUALITY)})
-			exp=equal_gd()
-	|	LOOKAHEAD(2, { this.isRequirement(RequireKey.FLUENTS)
-			|| this.isRequirement(RequireKey.NUMERIC_FLUENTS)
-			|| this.isRequirement(RequireKey.OBJECT_FLUENTS)})
-			exp=f_comp()
+	|	LOOKAHEAD(2) // RequireKey.DISJUNCTIVE_PRECONDITIONS
+			exp=or_gd() {
+			    this.parsedProblem.addRequirement(RequireKey.DISJUNCTIVE_PRECONDITIONS);
+			}
+	|	LOOKAHEAD(2) // RequireKey.NEGATIVE_PRECONDITIONS
+			exp=not_gd() {
+                this.parsedProblem.addRequirement(RequireKey.NEGATIVE_PRECONDITIONS);
+			}
+	|	LOOKAHEAD(2) // RequireKey.EXISTENTIAL_PRECONDITIONS + RequireKey.NEGATIVE_PRECONDITIONS
+			exp=imply_gd() {
+			    this.parsedProblem.addRequirement(RequireKey.EXISTENTIAL_PRECONDITIONS);
+			    this.parsedProblem.addRequirement(RequireKey.NEGATIVE_PRECONDITIONS);
+			}
+	|	LOOKAHEAD(2) // RequireKey.EXISTENTIAL_PRECONDITIONS
+			exp=exists_gd() {
+			    this.parsedProblem.addRequirement(RequireKey.EXISTENTIAL_PRECONDITIONS);
+			}
+	|	LOOKAHEAD(2) // RequireKey.UNIVERSAL_PRECONDITIONS
+			exp=forall_gd() {
+			    this.parsedProblem.addRequirement(RequireKey.UNIVERSAL_PRECONDITIONS);
+			}
+	| 	LOOKAHEAD(3) // RequireKey.EQUALITY
+			exp=equal_gd() {
+                this.parsedProblem.addRequirement(RequireKey.EQUALITY);
+			}
+	|	LOOKAHEAD(2) // RequireKey.NUMERIC_FLUENTS ** TO CHECK **
+			exp=f_comp() {
+			    this.parsedProblem.addRequirement(RequireKey.NUMERIC_FLUENTS);
+			}
 	) {
 		return exp;
 	}
@@ -1937,32 +1891,33 @@ void structure_def() :
 {
 	( 	LOOKAHEAD(2)
 			op = action_def() {
-				this.domain.addAction(op);
+				this.parsedProblem.addAction(op);
 			}
-	|	LOOKAHEAD(2, { this.isRequirement(RequireKey.DURATIVE_ACTIONS)})
+	|	LOOKAHEAD(2) // RequireKey.DURATIVE_ACTIONS
 			op = durative_action_def() {
-				this.domain.addAction(op);
-			}
-	|	LOOKAHEAD(2, { this.isRequirement(RequireKey.DERIVED_PREDICATES)})
+				this.parsedProblem.addAction(op);
+				this.parsedProblem.addRequirement(RequireKey.DURATIVE_ACTIONS);
+            }
+	|	LOOKAHEAD(2) // RequireKey.DERIVED_PREDICATES
 			dp = derived_def() {
-				this.domain.addDerivedPredicate(dp);
+				this.parsedProblem.addDerivedPredicate(dp);
+				this.parsedProblem.addRequirement(RequireKey.DERIVED_PREDICATES);
 			}
-    |   LOOKAHEAD (2, {this.isRequirement(RequireKey.HIERARCHY)}) // ADD HDDL
-            op = htn_action_def() {
-                this.domain.addAction(op);
-            }
-    |   LOOKAHEAD (2, {this.isRequirement(RequireKey.HIERARCHY)}) // ADD HDDL
+    |   LOOKAHEAD (2) // ADD HDDL RequireKey.HIERARCHY
             task = comp_task_def() {
-                this.domain.addTask(task);
+                this.parsedProblem.addTask(task);
+                this.parsedProblem.addRequirement(RequireKey.HIERARCHY);
             }
-    |   LOOKAHEAD (2, {this.isRequirement(RequireKey.HIERARCHY)}) // ADD HDDL
+    |   LOOKAHEAD (2) // ADD HDDL RequireKey.HIERARCHY
             meth = method_def() {
-                this.domain.addMethod(meth);
+                this.parsedProblem.addMethod(meth);
+                this.parsedProblem.addRequirement(RequireKey.HIERARCHY);
             }
-    |	LOOKAHEAD(2, { this.isRequirement(RequireKey.DURATIVE_ACTIONS) // ADD HDDL2.1
-                && this.isRequirement(RequireKey.HIERARCHY)})
+    |	LOOKAHEAD(2)  // ADD HDDL2.1 RequireKey.HIERARCHY + RequireKey.DURATIVE_ACTIONS
             meth = durative_method_def() {
-                this.domain.addMethod(meth);
+                this.parsedProblem.addMethod(meth);
+                this.parsedProblem.addRequirement(RequireKey.HIERARCHY);
+                this.parsedProblem.addRequirement(RequireKey.DURATIVE_ACTIONS);
             }
 	)
 }
@@ -1983,8 +1938,10 @@ ParsedMethod method_def() : // ADD HDDL
 		begin=left_bracket() <METHOD> name=method_name()
 			<PARAMETERS> <LEFT_BRACKET> parameters=typed_list(Lexer.VARIABLE) <RIGHT_BRACKET>
 			<TASK> taskID=task_formula(Lexer.TERM)
-			[LOOKAHEAD(2, { this.isRequirement(RequireKey.METHOD_PRECONDITIONS)})
-			    <PRECONDITION> precondition=pre_gd()
+			[LOOKAHEAD(2) // RequireKey.METHOD_PRECONDITIONS
+			    <PRECONDITION> precondition=pre_gd() {
+			        this.parsedProblem.addRequirement(RequireKey.METHOD_PRECONDITIONS);
+			    }
 			]
             tn = task_network()
 		end=right_bracket()
@@ -2017,8 +1974,10 @@ ParsedMethod durative_method_def() : // ADD HDDL2.1
 	        <PARAMETERS> <LEFT_BRACKET> parameters=typed_list(Lexer.VARIABLE) <RIGHT_BRACKET>
 			<TASK> taskID=task_formula(Lexer.TERM)
 			[<DURATION> duration=method_duration_constraint()]
-			[LOOKAHEAD(2, { this.isRequirement(RequireKey.METHOD_PRECONDITIONS)})
-			    <CONDITION> condition=da_gd()
+			[LOOKAHEAD(2) // RequireKey.METHOD_PRECONDITIONS
+			    <CONDITION> condition=da_gd() {
+			        this.parsedProblem.addRequirement(RequireKey.METHOD_PRECONDITIONS);
+                }
 			]
             tn = durative_task_network()
 		end=right_bracket()
@@ -2039,6 +1998,7 @@ ParsedTaskNetwork task_network() : // ADD HDDL
     Expression<String> ordering = new Expression<String>(Connector.AND);
     Expression<String> constraints = new Expression<String>(Connector.AND);
     ParsedTaskNetwork tn = null;
+    Boolean timed = false;
 }
 {
     LOOKAHEAD (1)
@@ -2054,7 +2014,7 @@ ParsedTaskNetwork task_network() : // ADD HDDL
         tasks = subtask_def()
         [<CONSTRAINTS> constraints = htn_constraints_def()]
         {
-            return new ParsedTaskNetwork(tasks, ordering, constraints, true, false);
+            return new ParsedTaskNetwork(tasks, ordering, constraints, true, true);
         }
 }
 
@@ -2064,13 +2024,14 @@ ParsedTaskNetwork durative_task_network() : // ADD HDDL
     Expression<String> ordering = new Expression<String>(Connector.AND);
     Expression<String> constraints = new Expression<String>(Connector.AND);
     ParsedTaskNetwork tn = null;
+    Boolean timed = false;
 }
 {
     LOOKAHEAD (1)
         (<TASKS> | <SUBTASKS>)
         tasks = subtask_def()
    	    [<ORDERING> ordering = durative_htn_ordering_constraints_def()]
-   	    [<CONSTRAINTS> constraints = htn_constraints_def()]
+   	    [<CONSTRAINTS> constraints = durative_htn_constraints_def()]
    	    {
             return new ParsedTaskNetwork(tasks, ordering, constraints, false, true);
         }
@@ -2269,8 +2230,9 @@ Expression<String> htn_ordering_constraint() : // ADD HDDL
     Expression<String> exp = null;
 }
 {
-    exp = less_htn_ordering_constraint() {
-            return exp;
+    exp = less_htn_ordering_constraint()
+    {
+        return exp;
     }
 }
 
@@ -2397,7 +2359,6 @@ Expression<String> great_or_equal_htn_temporal_ordering_constraint() : // ADD HD
     Expression<String> id2 = null;
     Token begin = null;
     Token end = null;
-
 }
 {
     begin=<LEFT_BRACKET> <GEQUAL> id1 = timed_task_id() id2 = timed_task_id() end=<RIGHT_BRACKET> {
@@ -2415,7 +2376,6 @@ Expression<String> not_equal_htn_temporal_ordering_constraint() : // ADD HDDL2.1
     Expression<String> equal = null;
     Token begin = null;
     Token end = null;
-
 }
 {
     begin=<LEFT_BRACKET> <NOT> equal = equal_htn_temporal_ordering_constraint() end=<RIGHT_BRACKET> {
@@ -2448,7 +2408,6 @@ Expression<String> task_id() : // ADD HDDL
 		exp.setTaskID(id);
 	    return exp;
 	}
-
 }
 
 Expression<String> timed_task_id() : // ADD HDDL2.1
@@ -2513,6 +2472,28 @@ Expression<String> htn_constraints_def() : // ADD HDDL
     }
 }
 
+Expression<String> durative_htn_constraints_def() : // ADD HDDL 2.1
+{
+    Expression<String> exp = null;
+    Expression<String> c = null;
+}
+{
+    (   LOOKAHEAD(2)
+            exp = empty_and()
+    |   LOOKAHEAD(2)
+            c = durative_htn_constraint() {
+                exp = new Expression<String>(Connector.AND);
+                exp.addChild(c);
+                exp.setLocation(c.getLocation());
+            }
+    |   LOOKAHEAD(2)
+            exp = durative_and_htn_constraints()
+    )
+    {
+        return exp;
+    }
+}
+
 Expression<String> and_htn_constraints() :  // ADD HDDL
 {
     Expression<String> exp = new Expression<String>(Connector.AND);
@@ -2530,7 +2511,24 @@ Expression<String> and_htn_constraints() :  // ADD HDDL
     }
 }
 
-Expression<String> htn_constraint() : // ADD HDDL
+Expression<String> durative_and_htn_constraints() :  // ADD HDDL 2.1
+{
+    Expression<String> exp = new Expression<String>(Connector.AND);
+    Expression<String> c = null;
+    Token begin = null;
+    Token end = null;
+}
+{
+    begin=<LEFT_BRACKET> <AND> (c = durative_htn_constraint() {
+        exp.addChild(c);
+    })+ end=<RIGHT_BRACKET> {
+        exp.setBegin(begin);
+        exp.setEnd(end);
+        return exp;
+    }
+}
+
+Expression<String> equality_htn_constraint() : // ADD HDDL
 {
     Expression<String> exp = null;
 }
@@ -2539,28 +2537,118 @@ Expression<String> htn_constraint() : // ADD HDDL
             exp = equal_atomic_formula()
     |   LOOKAHEAD(2)
             exp = not_equal_atomic_formula()
-    |   LOOKAHEAD(2, { this.isRequirement(RequireKey.METHOD_CONSTRAINTS)}) // ADD HDDL2.1
-            exp = hold_before_htn_constraint()
-    |   LOOKAHEAD(2, { this.isRequirement(RequireKey.METHOD_CONSTRAINTS)}) // ADD HDDL2.1
-            exp = hold_after_htn_constraint()
-    |   LOOKAHEAD(2, { this.isRequirement(RequireKey.METHOD_CONSTRAINTS)}) // ADD HDDL2.1
-            exp = hold_between_htn_constraint()
-    |   LOOKAHEAD(2, { this.isRequirement(RequireKey.METHOD_CONSTRAINTS)}) // ADD HDDL2.1
-            exp = hold_during_htn_constraint()
-    |   LOOKAHEAD(2, { this.isRequirement(RequireKey.METHOD_CONSTRAINTS)}) // ADD HDDL2.1
-            exp = at_end_htn_constraint()
-    |   LOOKAHEAD(2, { this.isRequirement(RequireKey.METHOD_CONSTRAINTS)}) // ADD HDDL2.1
-            exp = at_start_htn_constraint()
-    |   LOOKAHEAD(2, { this.isRequirement(RequireKey.METHOD_CONSTRAINTS)}) // ADD HDDL2.1
-            exp = always_htn_constraint()
-    |   LOOKAHEAD(2, { this.isRequirement(RequireKey.METHOD_CONSTRAINTS)}) // ADD HDDL2.1
-            exp = at_most_one_htn_constraint()
-    |   LOOKAHEAD(2, { this.isRequirement(RequireKey.METHOD_CONSTRAINTS)}) // ADD HDDL2.1
-            exp = sometime_htn_constraint()
-    |   LOOKAHEAD(2, { this.isRequirement(RequireKey.METHOD_CONSTRAINTS)}) // ADD HDDL2.1
-            exp = sometime_before_htn_constraint()
-    |   LOOKAHEAD(2, { this.isRequirement(RequireKey.METHOD_CONSTRAINTS)}) // ADD HDDL2.1
-            exp = sometime_after_htn_constraint()
+    ) {
+        return exp;
+    }
+}
+
+Expression<String> htn_constraint() : // ADD HDDL
+{
+    Expression<String> exp = null;
+}
+{
+    (  LOOKAHEAD(2)
+            exp = equality_htn_constraint()
+    |   LOOKAHEAD(2) // ADD HDDL2.1
+            exp = hold_before_htn_constraint() {
+                this.parsedProblem.addRequirement(RequireKey.METHOD_CONSTRAINTS);
+            }
+    |   LOOKAHEAD(2) // ADD HDDL2.1
+            exp = hold_after_htn_constraint() {
+                this.parsedProblem.addRequirement(RequireKey.METHOD_CONSTRAINTS);
+            }
+    |   LOOKAHEAD(2) // ADD HDDL2.1
+            exp = hold_between_htn_constraint() {
+                this.parsedProblem.addRequirement(RequireKey.METHOD_CONSTRAINTS);
+            }
+    |   LOOKAHEAD(2) // ADD HDDL2.1
+            exp = hold_during_htn_constraint() {
+                this.parsedProblem.addRequirement(RequireKey.METHOD_CONSTRAINTS);
+            }
+    |   LOOKAHEAD(2) // ADD HDDL2.1
+            exp = at_end_htn_constraint() {
+                this.parsedProblem.addRequirement(RequireKey.METHOD_CONSTRAINTS);
+            }
+    |   LOOKAHEAD(2) // ADD HDDL2.1
+            exp = at_start_htn_constraint() {
+                this.parsedProblem.addRequirement(RequireKey.METHOD_CONSTRAINTS);
+            }
+    |   LOOKAHEAD(2) // ADD HDDL2.1
+            exp = always_htn_constraint() {
+                this.parsedProblem.addRequirement(RequireKey.METHOD_CONSTRAINTS);
+            }
+    |   LOOKAHEAD(2) // ADD HDDL2.1
+            exp = at_most_once_htn_constraint() {
+                this.parsedProblem.addRequirement(RequireKey.METHOD_CONSTRAINTS);
+            }
+    |   LOOKAHEAD(2) // ADD HDDL2.1
+            exp = sometime_htn_constraint() {
+                this.parsedProblem.addRequirement(RequireKey.METHOD_CONSTRAINTS);
+            }
+    |   LOOKAHEAD(2) // ADD HDDL2.1
+            exp = sometime_before_htn_constraint() {
+                this.parsedProblem.addRequirement(RequireKey.METHOD_CONSTRAINTS);
+            }
+    |   LOOKAHEAD(2) // ADD HDDL2.1
+            exp = sometime_after_htn_constraint() {
+                this.parsedProblem.addRequirement(RequireKey.METHOD_CONSTRAINTS);
+            }
+    ) {
+        return exp;
+    }
+}
+
+Expression<String> durative_htn_constraint() : // ADD HDDL 2.1
+{
+    Expression<String> exp = null;
+}
+{
+    (   LOOKAHEAD(2)
+            exp = equality_htn_constraint()
+    |   LOOKAHEAD(2)
+            exp = hold_before_durative_htn_constraint()  {
+                this.parsedProblem.addRequirement(RequireKey.METHOD_CONSTRAINTS);
+            }
+    |   LOOKAHEAD(2)
+            exp = hold_after_durative_htn_constraint() {
+                this.parsedProblem.addRequirement(RequireKey.METHOD_CONSTRAINTS);
+            }
+    |   LOOKAHEAD(2)
+            exp = hold_between_durative_htn_constraint() {
+                this.parsedProblem.addRequirement(RequireKey.METHOD_CONSTRAINTS);
+            }
+    |   LOOKAHEAD(2)
+            exp = hold_during_durative_htn_constraint() {
+                this.parsedProblem.addRequirement(RequireKey.METHOD_CONSTRAINTS);
+            }
+    |   LOOKAHEAD(2)
+            exp = at_end_durative_htn_constraint() {
+                this.parsedProblem.addRequirement(RequireKey.METHOD_CONSTRAINTS);
+            }
+    |   LOOKAHEAD(2)
+            exp = at_start_durative_htn_constraint() {
+                this.parsedProblem.addRequirement(RequireKey.METHOD_CONSTRAINTS);
+            }
+    |   LOOKAHEAD(2)
+            exp = always_durative_htn_constraint() {
+                this.parsedProblem.addRequirement(RequireKey.METHOD_CONSTRAINTS);
+            }
+    |   LOOKAHEAD(2)
+            exp = at_most_once_durative_htn_constraint() {
+                this.parsedProblem.addRequirement(RequireKey.METHOD_CONSTRAINTS);
+            }
+    |   LOOKAHEAD(2)
+            exp = sometime_durative_htn_constraint() {
+                this.parsedProblem.addRequirement(RequireKey.METHOD_CONSTRAINTS);
+            }
+    |   LOOKAHEAD(2)
+            exp = sometime_before_durative_htn_constraint() {
+                this.parsedProblem.addRequirement(RequireKey.METHOD_CONSTRAINTS);
+            }
+    |   LOOKAHEAD(2)
+            exp = sometime_after_durative_htn_constraint() {
+                this.parsedProblem.addRequirement(RequireKey.METHOD_CONSTRAINTS);
+            }
     ) {
         return exp;
     }
@@ -2576,6 +2664,24 @@ Expression<String> hold_before_htn_constraint() : // ADD HDDL2.1
 }
 {
     begin=<LEFT_BRACKET> <HOLD_BEFORE> id = task_id() gd = gd() end=<RIGHT_BRACKET> {
+        exp.addChild(id);
+        exp.addChild(gd);
+        exp.setBegin(begin);
+        exp.setEnd(end);
+        return exp;
+    }
+}
+
+Expression<String> hold_before_durative_htn_constraint() : // ADD HDDL2.1
+{
+    Expression<String> exp = new Expression<String>(Connector.HOLD_BEFORE_METHOD_CONSTRAINT);
+    Expression<String> id = null;
+    Expression<String> gd = null;
+    Token begin = null;
+    Token end = null;
+}
+{
+    begin=<LEFT_BRACKET> <HOLD_BEFORE> id = timed_task_id() gd = gd() end=<RIGHT_BRACKET> {
         exp.addChild(id);
         exp.addChild(gd);
         exp.setBegin(begin);
@@ -2602,6 +2708,24 @@ Expression<String> hold_after_htn_constraint() : // ADD HDDL2.1
     }
 }
 
+Expression<String> hold_after_durative_htn_constraint() : // ADD HDDL2.1
+{
+    Expression<String> exp = new Expression<String>(Connector.HOLD_AFTER_METHOD_CONSTRAINT);
+    Expression<String> id = null;
+    Expression<String> effect = null;
+    Token begin = null;
+    Token end = null;
+}
+{
+    begin=<LEFT_BRACKET> <HOLD_AFTER> id = timed_task_id() effect = effect() end=<RIGHT_BRACKET> {
+        exp.addChild(id);
+        exp.addChild(effect);
+        exp.setBegin(begin);
+        exp.setEnd(end);
+        return exp;
+    }
+}
+
 Expression<String> hold_between_htn_constraint() : // ADD HDDL2.1
 {
     Expression<String> exp = new Expression<String>(Connector.HOLD_BETWEEN_METHOD_CONSTRAINT);
@@ -2613,6 +2737,26 @@ Expression<String> hold_between_htn_constraint() : // ADD HDDL2.1
 }
 {
     begin=<LEFT_BRACKET> <HOLD_BETWEEN> id1 = task_id() id2 = task_id() gd = gd() end=<RIGHT_BRACKET> {
+    exp.addChild(id1);
+    exp.addChild(id2);
+    exp.addChild(gd);
+    exp.setBegin(begin);
+    exp.setEnd(end);
+    return exp;
+}
+}
+
+Expression<String> hold_between_durative_htn_constraint() : // ADD HDDL2.1
+{
+    Expression<String> exp = new Expression<String>(Connector.HOLD_BETWEEN_METHOD_CONSTRAINT);
+    Expression<String> id1 = null;
+    Expression<String> id2 = null;
+    Expression<String> gd = null;
+    Token begin = null;
+    Token end = null;
+}
+{
+    begin=<LEFT_BRACKET> <HOLD_BETWEEN> id1 = timed_task_id() id2 = timed_task_id() gd = gd() end=<RIGHT_BRACKET> {
     exp.addChild(id1);
     exp.addChild(id2);
     exp.addChild(gd);
@@ -2642,6 +2786,26 @@ Expression<String> hold_during_htn_constraint() : // ADD HDDL2.1
     }
 }
 
+Expression<String> hold_during_durative_htn_constraint() : // ADD HDDL2.1
+{
+    Expression<String> exp = new Expression<String>(Connector.HOLD_DURING_METHOD_CONSTRAINT);
+    Expression<String> id1 = null;
+    Expression<String> id2 = null;
+    Expression<String> gd = null;
+    Token begin = null;
+    Token end = null;
+}
+{
+    begin=<LEFT_BRACKET> <HOLD_DURING> id1 = timed_task_id() id2 = timed_task_id() gd = gd() end=<RIGHT_BRACKET> {
+        exp.addChild(id1);
+        exp.addChild(id2);
+        exp.addChild(gd);
+        exp.setBegin(begin);
+        exp.setEnd(end);
+        return exp;
+    }
+}
+
 Expression<String> at_end_htn_constraint() : // ADD HDDL2.1
 {
     Expression<String> exp = new Expression<String>(Connector.AT_END_METHOD_CONSTRAINT);
@@ -2652,6 +2816,24 @@ Expression<String> at_end_htn_constraint() : // ADD HDDL2.1
 }
 {
     begin=<LEFT_BRACKET> <AT> <END> id = task_id() effect = effect() end=<RIGHT_BRACKET> {
+        exp.addChild(id);
+        exp.addChild(effect);
+        exp.setBegin(begin);
+        exp.setEnd(end);
+        return exp;
+    }
+}
+
+Expression<String> at_end_durative_htn_constraint() : // ADD HDDL2.1
+{
+    Expression<String> exp = new Expression<String>(Connector.AT_END_METHOD_CONSTRAINT);
+    Expression<String> id = null;
+    Expression<String> effect = null;
+    Token begin = null;
+    Token end = null;
+}
+{
+    begin=<LEFT_BRACKET> <AT> <END> id = timed_task_id() effect = effect() end=<RIGHT_BRACKET> {
         exp.addChild(id);
         exp.addChild(effect);
         exp.setBegin(begin);
@@ -2678,6 +2860,24 @@ Expression<String> at_start_htn_constraint() : // ADD HDDL2.1
     }
 }
 
+Expression<String> at_start_durative_htn_constraint() : // ADD HDDL2.1
+{
+    Expression<String> exp = new Expression<String>(Connector.AT_START_METHOD_CONSTRAINT);
+    Expression<String> id = null;
+    Expression<String> gd = null;
+    Token begin = null;
+    Token end = null;
+}
+{
+    begin=<LEFT_BRACKET> <AT> <START> id = timed_task_id() gd = gd() end=<RIGHT_BRACKET> {
+        exp.addChild(id);
+        exp.addChild(gd);
+        exp.setBegin(begin);
+        exp.setEnd(end);
+        return exp;
+    }
+}
+
 Expression<String> always_htn_constraint() : // ADD HDDL2.1
 {
     Expression<String> exp = new Expression<String>(Connector.ALWAYS_METHOD_CONSTRAINT);
@@ -2696,7 +2896,25 @@ Expression<String> always_htn_constraint() : // ADD HDDL2.1
     }
 }
 
-Expression<String> at_most_one_htn_constraint() : // ADD HDDL2.1
+Expression<String> always_durative_htn_constraint() : // ADD HDDL2.1
+{
+    Expression<String> exp = new Expression<String>(Connector.ALWAYS_METHOD_CONSTRAINT);
+    Expression<String> id = null;
+    Expression<String> gd = null;
+    Token begin = null;
+    Token end = null;
+}
+{
+    begin=<LEFT_BRACKET> <ALWAYS> id = timed_task_id() gd = gd() end=<RIGHT_BRACKET> {
+        exp.addChild(id);
+        exp.addChild(gd);
+        exp.setBegin(begin);
+        exp.setEnd(end);
+        return exp;
+    }
+}
+
+Expression<String> at_most_once_htn_constraint() : // ADD HDDL2.1
 {
     Expression<String> exp = new Expression<String>(Connector.AT_MOST_ONCE_METHOD_CONSTRAINT);
     Expression<String> id = null;
@@ -2706,6 +2924,24 @@ Expression<String> at_most_one_htn_constraint() : // ADD HDDL2.1
 }
 {
     begin=<LEFT_BRACKET> <AT_MOST_ONCE> id = task_id() gd = gd() end=<RIGHT_BRACKET> {
+        exp.addChild(id);
+        exp.addChild(gd);
+        exp.setBegin(begin);
+        exp.setEnd(end);
+        return exp;
+    }
+}
+
+Expression<String> at_most_once_durative_htn_constraint() : // ADD HDDL2.1
+{
+    Expression<String> exp = new Expression<String>(Connector.AT_MOST_ONCE_METHOD_CONSTRAINT);
+    Expression<String> id = null;
+    Expression<String> gd = null;
+    Token begin = null;
+    Token end = null;
+}
+{
+    begin=<LEFT_BRACKET> <AT_MOST_ONCE> id = timed_task_id() gd = gd() end=<RIGHT_BRACKET> {
         exp.addChild(id);
         exp.addChild(gd);
         exp.setBegin(begin);
@@ -2732,6 +2968,24 @@ Expression<String> sometime_htn_constraint() : // ADD HDDL2.1
     }
 }
 
+Expression<String> sometime_durative_htn_constraint() : // ADD HDDL2.1
+{
+    Expression<String> exp = new Expression<String>(Connector.SOMETIME_METHOD_CONSTRAINT);
+    Expression<String> id = null;
+    Expression<String> gd = null;
+    Token begin = null;
+    Token end = null;
+}
+{
+    begin=<LEFT_BRACKET> <SOMETIME> id = timed_task_id() gd = gd() end=<RIGHT_BRACKET> {
+        exp.addChild(id);
+        exp.addChild(gd);
+        exp.setBegin(begin);
+        exp.setEnd(end);
+        return exp;
+    }
+}
+
 Expression<String> sometime_before_htn_constraint() : // ADD HDDL2.1
 {
     Expression<String> exp = new Expression<String>(Connector.SOMETIME_BEFORE_METHOD_CONSTRAINT);
@@ -2750,6 +3004,24 @@ Expression<String> sometime_before_htn_constraint() : // ADD HDDL2.1
     }
 }
 
+Expression<String> sometime_before_durative_htn_constraint() : // ADD HDDL2.1
+{
+    Expression<String> exp = new Expression<String>(Connector.SOMETIME_BEFORE_METHOD_CONSTRAINT);
+    Expression<String> id = null;
+    Expression<String> gd = null;
+    Token begin = null;
+    Token end = null;
+}
+{
+    begin=<LEFT_BRACKET> <SOMETIME_BEFORE> id = timed_task_id() gd = gd() end=<RIGHT_BRACKET> {
+        exp.addChild(id);
+        exp.addChild(gd);
+        exp.setBegin(begin);
+        exp.setEnd(end);
+        return exp;
+    }
+}
+
 Expression<String> sometime_after_htn_constraint() : // ADD HDDL2.1
 {
     Expression<String> exp = new Expression<String>(Connector.SOMETIME_AFTER_METHOD_CONSTRAINT);
@@ -2760,6 +3032,24 @@ Expression<String> sometime_after_htn_constraint() : // ADD HDDL2.1
 }
 {
     begin=<LEFT_BRACKET> <SOMETIME_AFTER> id = task_id() gd = gd() end=<RIGHT_BRACKET> {
+        exp.addChild(id);
+        exp.addChild(gd);
+        exp.setBegin(begin);
+        exp.setEnd(end);
+        return exp;
+    }
+}
+
+Expression<String> sometime_after_durative_htn_constraint() : // ADD HDDL2.1
+{
+    Expression<String> exp = new Expression<String>(Connector.SOMETIME_AFTER_METHOD_CONSTRAINT);
+    Expression<String> id = null;
+    Expression<String> gd = null;
+    Token begin = null;
+    Token end = null;
+}
+{
+    begin=<LEFT_BRACKET> <SOMETIME_AFTER> id = timed_task_id() gd = gd() end=<RIGHT_BRACKET> {
         exp.addChild(id);
         exp.addChild(gd);
         exp.setBegin(begin);
@@ -2863,9 +3153,15 @@ Expression<String> pre_gd() :
 	Expression<String> exp = null;
 }
 {
-	(	LOOKAHEAD(3, { this.isRequirement(RequireKey.PREFERENCES)}) exp=pref_gd()
+	(	LOOKAHEAD(3) // RequireKey.PREFERENCES
+            exp=pref_gd() {
+                this.parsedProblem.addRequirement(RequireKey.PREFERENCES);
+            }
 	|	LOOKAHEAD(2) exp=and_pre_gd()
-	|	LOOKAHEAD(2, { this.isRequirement(RequireKey.UNIVERSAL_PRECONDITIONS)}) exp=forall_pre_gd()
+	|	LOOKAHEAD(2) // RequireKey.UNIVERSAL_PRECONDITIONS
+            exp=forall_pre_gd() {
+                this.parsedProblem.addRequirement(RequireKey.UNIVERSAL_PRECONDITIONS);
+            }
 	|	LOOKAHEAD(2) exp=empty_or()
 	|	LOOKAHEAD(2) exp=gd()
 	) {
@@ -3014,8 +3310,14 @@ Expression<String> c_effect() :
 	Expression<String> exp = null;
 }
 {
-	(	LOOKAHEAD(2, { this.isRequirement(RequireKey.CONDITIONAL_EFFECTS)}) exp=forall_effect()
-	|	LOOKAHEAD(2, { this.isRequirement(RequireKey.CONDITIONAL_EFFECTS)}) exp=when_con_effect()
+	(	LOOKAHEAD(2) // RequireKey.CONDITIONAL_EFFECTS)
+            exp=forall_effect() {
+                this.parsedProblem.addRequirement(RequireKey.CONDITIONAL_EFFECTS);
+            }
+	|	LOOKAHEAD(2) // RequireKey.CONDITIONAL_EFFECTS)
+            exp=when_con_effect() {
+                this.parsedProblem.addRequirement(RequireKey.CONDITIONAL_EFFECTS);
+            }
 	|	LOOKAHEAD(2) exp=p_effect()
 	) {
 		return exp;
@@ -3102,15 +3404,18 @@ Expression<String> p_effect() :
 	Expression<String> exp = null;
 }
 {
- 	(	LOOKAHEAD(2, { this.isRequirement(RequireKey.FLUENTS)
-    			|| this.isRequirement(RequireKey.NUMERIC_FLUENTS)
-    			|| this.isRequirement(RequireKey.OBJECT_FLUENTS)}) exp=assign_op()
-    	|   LOOKAHEAD(2, { this.isRequirement(RequireKey.ACTION_COSTS) }) exp=increase_total_cost()
+ 	(	LOOKAHEAD(2) // RequireKey.NUMERIC_FLUENTS
+            exp=assign_op() {
+                this.parsedProblem.addRequirement(RequireKey.NUMERIC_FLUENTS);
+            }
+    |   LOOKAHEAD(2) // RequireKey.ACTION_COSTS
+            exp=increase_total_cost() {
+                this.parsedProblem.addRequirement(RequireKey.ACTION_COSTS);
+            }
     	|	LOOKAHEAD(2) exp=literal(Lexer.TERM)
     	) {
     		return exp;
     	}
-
 }
 
 Expression<String> increase_total_cost() :
@@ -3331,7 +3636,10 @@ Expression<String> duration_constraint() :
 }
 {
 	(	LOOKAHEAD(2) exp=empty_or()
-	|	LOOKAHEAD(2, { this.isRequirement(RequireKey.DURATION_INEQUALITIES)}) exp=and_simple_duration_constraint()
+	|	LOOKAHEAD(2) // RequireKey.DURATION_INEQUALITIES
+            exp=and_simple_duration_constraint() {
+                this.parsedProblem.addRequirement(RequireKey.DURATION_INEQUALITIES);
+            }
 	|	LOOKAHEAD(2) exp=simple_duration_constraint()
 	) {
 		return exp;
@@ -3420,10 +3728,14 @@ Expression<String> d_op() :
 {
 	(	LOOKAHEAD(2)
 			exp=equal_d_op()
-	|	LOOKAHEAD(2, { this.isRequirement(RequireKey.DURATION_INEQUALITIES)})
-			exp=gequal_d_op()
-	| 	LOOKAHEAD(2, { this.isRequirement(RequireKey.DURATION_INEQUALITIES)})
-			exp=lequal_d_op()
+	|	LOOKAHEAD(2) // RequireKey.DURATION_INEQUALITIES
+            exp=gequal_d_op() {
+                this.parsedProblem.addRequirement(RequireKey.DURATION_INEQUALITIES);
+            }
+	| 	LOOKAHEAD(2) // RequireKey.DURATION_INEQUALITIES
+            exp=lequal_d_op() {
+                this.parsedProblem.addRequirement(RequireKey.DURATION_INEQUALITIES);
+            }
 	) {
 		return exp;
 	}
@@ -3506,9 +3818,10 @@ Expression<String> d_value() :
 }
 {
 	(	LOOKAHEAD(2) exp=number()
-	| 	LOOKAHEAD(2, { this.isRequirement(RequireKey.FLUENTS)
-			|| this.isRequirement(RequireKey.NUMERIC_FLUENTS)
-			|| this.isRequirement(RequireKey.OBJECT_FLUENTS)}) exp=f_exp()
+	| 	LOOKAHEAD(2) // RequireKey.NUMERIC_FLUENTS
+           exp=f_exp() {
+                this.parsedProblem.addRequirement(RequireKey.NUMERIC_FLUENTS);
+           }
 	) {
 		return exp;
 	}
@@ -3521,8 +3834,10 @@ Expression<String> method_duration_constraint() : // ADD HDDL2.1
 {
 	(	LOOKAHEAD(2) exp=empty_or()
 	|	LOOKAHEAD(2) exp=simple_method_duration_constraint() // ADD HDDL2.1
-	|	LOOKAHEAD(2, { this.isRequirement(RequireKey.DURATION_INEQUALITIES)}) // ADD HDDL2.1
-            exp=and_simple_method_duration_constraint()
+	|	LOOKAHEAD(2) // ADD HDDL2.1 RequireKey.DURATION_INEQUALITIES
+            exp=and_simple_method_duration_constraint() {
+                this.parsedProblem.addRequirement(RequireKey.DURATION_INEQUALITIES);
+            }
 	) {
 	    return exp;
 	}
@@ -3553,14 +3868,22 @@ Expression<String> simple_method_duration_constraint() : // ADD HDDL2.1
 {
 	(	LOOKAHEAD(2)
             exp=equal_method_duration_constraint()
-    |	LOOKAHEAD(2, { this.isRequirement(RequireKey.DURATION_INEQUALITIES)})
-             exp=great_method_duration_constraint()
-    | 	LOOKAHEAD(2, { this.isRequirement(RequireKey.DURATION_INEQUALITIES)})
-            exp=great_or_equal_method_duration_constraint()
-    |   LOOKAHEAD(2, { this.isRequirement(RequireKey.DURATION_INEQUALITIES)})
-            exp=less_method_duration_constraint()
-    | 	LOOKAHEAD(2, { this.isRequirement(RequireKey.DURATION_INEQUALITIES)})
-            exp=less_or_equal_method_duration_constraint()
+    |	LOOKAHEAD(2) // RequireKey.DURATION_INEQUALITIES
+            exp=great_method_duration_constraint() {
+                this.parsedProblem.addRequirement(RequireKey.DURATION_INEQUALITIES);
+            }
+    | 	LOOKAHEAD(2) // RequireKey.DURATION_INEQUALITIES
+            exp=great_or_equal_method_duration_constraint() {
+                this.parsedProblem.addRequirement(RequireKey.DURATION_INEQUALITIES);
+            }
+    |   LOOKAHEAD(2) // RequireKey.DURATION_INEQUALITIES
+            exp=less_method_duration_constraint() {
+                this.parsedProblem.addRequirement(RequireKey.DURATION_INEQUALITIES);
+            }
+    | 	LOOKAHEAD(2) // RequireKey.DURATION_INEQUALITIES
+            exp=less_or_equal_method_duration_constraint() {
+                this.parsedProblem.addRequirement(RequireKey.DURATION_INEQUALITIES);
+            }
 	|	LOOKAHEAD(2) exp=at_simple_duration_constraint()
 	) {
 		return exp;
@@ -3742,8 +4065,10 @@ Expression<String> da_gd():
 {
 	(	LOOKAHEAD(2) exp=pref_timed_gd()
 	|	LOOKAHEAD(2) exp=and_da_gd()
-	|	LOOKAHEAD(2, { this.isRequirement(RequireKey.UNIVERSAL_PRECONDITIONS)})
-			exp=forall_da_gd()
+	|	LOOKAHEAD(2) // RequireKey.UNIVERSAL_PRECONDITIONS
+            exp=forall_da_gd() {
+                this.parsedProblem.addRequirement(RequireKey.UNIVERSAL_PRECONDITIONS);
+            }
 	) {
 		return exp;
 	}
@@ -3797,8 +4122,10 @@ Expression<String> pref_timed_gd() :
 {
 	(	LOOKAHEAD(2)
 			exp=timed_gd()
-	|	LOOKAHEAD(2, { this.isRequirement(RequireKey.PREFERENCES)})
-			exp=named_pref_timed_gd()
+	|	LOOKAHEAD(2) // RequireKey.PREFERENCES
+            exp=named_pref_timed_gd() {
+                this.parsedProblem.addRequirement(RequireKey.PREFERENCES);
+            }
 	) {
 		return exp;
 	}
@@ -3908,15 +4235,18 @@ Expression<String> da_effect() :
 			exp=and_da_effect()
 	| 	LOOKAHEAD(2)
 			exp=timed_effect()
-	|	LOOKAHEAD(2, {this.isRequirement(RequireKey.CONDITIONAL_EFFECTS)})
-			exp=forall_da_effect()
-	|	LOOKAHEAD(2, {this.isRequirement(RequireKey.CONDITIONAL_EFFECTS)})
-			exp=when_da_effect()
-	| 	LOOKAHEAD(2, {this.isRequirement(RequireKey.FLUENTS)
-			|| this.isRequirement(RequireKey.NUMERIC_FLUENTS)
-			|| this.isRequirement(RequireKey.OBJECT_FLUENTS)})
-			exp=da_assign_op()
-
+	|	LOOKAHEAD(2) // RequireKey.CONDITIONAL_EFFECTS
+            exp=forall_da_effect() {
+                this.parsedProblem.addRequirement(RequireKey.CONDITIONAL_EFFECTS);
+            }
+	|	LOOKAHEAD(2) // RequireKey.CONDITIONAL_EFFECTS
+            exp=when_da_effect() {
+                this.parsedProblem.addRequirement(RequireKey.CONDITIONAL_EFFECTS);
+            }
+	| 	LOOKAHEAD(2) // RequireKey.NUMERIC_FLUENTS + RequireKey.OBJECT_FLUENTS ** TO CHECK **
+			exp=da_assign_op() {
+			    this.parsedProblem.addRequirement(RequireKey.NUMERIC_FLUENTS);
+			}
 	) {
 		return exp;
 	}
@@ -4098,8 +4428,10 @@ Expression<String> timed_effect() :
 {
 	(	LOOKAHEAD(2)
 			exp=at_a_effect()
-	|	LOOKAHEAD(3, {this.isRequirement(RequireKey.CONTINOUS_EFFECTS)})
-			exp=assign_op_t()
+	|	LOOKAHEAD(3) // RequireKey.CONTINOUS_EFFECTS
+			exp=assign_op_t() {
+			    this.parsedProblem.addRequirement(RequireKey.CONTINOUS_EFFECTS);
+			}
 	) {
 		return exp;
 	}
@@ -4333,13 +4665,15 @@ Expression<String> f_exp_da() :
 }
 {
 	(	LOOKAHEAD(2) exp=da_op()
-	|	LOOKAHEAD(2, {this.isRequirement(RequireKey.DURATION_INEQUALITIES)}) exp=var_duration()
+	|	LOOKAHEAD(2) // RequireKey.DURATION_INEQUALITIES
+	        exp=var_duration() {
+	            this.parsedProblem.addRequirement(RequireKey.DURATION_INEQUALITIES);
+	        }
 	|	LOOKAHEAD(2) exp=f_exp()
 	) {
 		return exp;
 	}
 }
-
 
 Expression<String> da_op() :
 {
@@ -4439,7 +4773,7 @@ ParsedProblem problem() :
             htn_problem()
     |    pddl_problem()
     ) {
-    return this.problem;
+    return this.parsedProblem;
     }
 }
 
@@ -4456,15 +4790,23 @@ ParsedProblem pddl_problem() :
 		<RIGHT_BRACKET>
 		<LEFT_BRACKET> <P_DOMAIN>
 			domain = domain_problem_name() {
-                this.problem = new DefaultParsedProblem(domain, problem);
+                this.parsedProblem = new DefaultParsedProblem(domain, problem);
             }
 		<RIGHT_BRACKET>
 		[LOOKAHEAD(2) require_def(Lexer.PARSER_PROBLEM)]
 		[LOOKAHEAD(2) object_declaration()]
         init()
 		goal()
-		[LOOKAHEAD(2, {this.isRequirement(RequireKey.CONSTRAINTS)}) pddl_const(Lexer.PARSER_PROBLEM)]
-		[LOOKAHEAD(2, {this.isRequirement(RequireKey.NUMERIC_FLUENTS)}) metric_spec()]
+		[LOOKAHEAD(2) // RequireKey.CONSTRAINTS
+		    pddl_const(Lexer.PARSER_PROBLEM) {
+		        this.parsedProblem.addRequirement(RequireKey.CONSTRAINTS);
+		    }
+		]
+		[LOOKAHEAD(2) // RequireKey.NUMERIC_FLUENTS
+		    metric_spec() {
+                this.parsedProblem.addRequirement(RequireKey.NUMERIC_FLUENTS);
+		    }
+		]
 		// [length-spec()] not implemented
 		<RIGHT_BRACKET>
 		<EOF>
@@ -4472,7 +4814,7 @@ ParsedProblem pddl_problem() :
 		this.error(e, token.beginLine, token.beginColumn);
 	}
 	{
-	    return this.problem;
+	    return this.parsedProblem;
     }
 }
 
@@ -4480,8 +4822,6 @@ ParsedProblem htn_problem() : // ADD HDDL
 {
 	Symbol<String> problem;
 	Symbol<String> domain;
-	ParsedTaskNetwork taskNetwork;
-	List<TypedSymbol<String>> parameters = new ArrayList<TypedSymbol<String>>();
 }
 {
 	try {
@@ -4491,36 +4831,55 @@ ParsedProblem htn_problem() : // ADD HDDL
 		<RIGHT_BRACKET>
 		<LEFT_BRACKET> <P_DOMAIN>
 			domain = domain_problem_name() {
-			    this.problem = new DefaultParsedProblem(domain, problem);
+			    this.parsedProblem = new DefaultParsedProblem(domain, problem);
 		    }
 
 		<RIGHT_BRACKET>
 		[LOOKAHEAD(2) require_def(Lexer.PARSER_PROBLEM)]
 		[LOOKAHEAD(2) object_declaration()]
-        <LEFT_BRACKET> <HTN>
-            [LOOKAHEAD(2) <PARAMETERS> <LEFT_BRACKET> parameters=typed_list(Lexer.VARIABLE) <RIGHT_BRACKET>]
-            (   LOOKAHEAD(2, {!this.isRequirement(RequireKey.DURATIVE_ACTIONS)})
-                taskNetwork = task_network()
-            |   LOOKAHEAD(2, {this.isRequirement(RequireKey.DURATIVE_ACTIONS)})
-                    taskNetwork = durative_task_network()
-            ) {
-                taskNetwork.setParameters(parameters);
-                this.problem.setInitialTaskNetwork(taskNetwork);
-            }
-        <RIGHT_BRACKET>
+        init_task_network()
 		init()
 		[LOOKAHEAD(2) goal()]
-		[LOOKAHEAD(2, {this.isRequirement(RequireKey.NUMERIC_FLUENTS)}) metric_spec()]
+		[LOOKAHEAD(2) // RequireKey.NUMERIC_FLUENTS
+            metric_spec() {
+                this.parsedProblem.addRequirement(RequireKey.NUMERIC_FLUENTS);
+            }
+        ]
 		<RIGHT_BRACKET>
 		<EOF>
 	} catch(Throwable e) {
 		this.error(e, token.beginLine, token.beginColumn);
 	}
     {
-        return this.problem;
+        return this.parsedProblem;
     }
 }
 
+void init_task_network() :
+{
+    ParsedTaskNetwork taskNetwork;
+    List<TypedSymbol<String>> parameters = new ArrayList<TypedSymbol<String>>();
+}
+{
+    (LOOKAHEAD(2)
+        <LEFT_BRACKET> <HTN>
+            [LOOKAHEAD(2) <PARAMETERS> <LEFT_BRACKET> parameters=typed_list(Lexer.VARIABLE) <RIGHT_BRACKET>]
+            taskNetwork = task_network() {
+                taskNetwork.setParameters(parameters);
+                this.parsedProblem.setInitialTaskNetwork(taskNetwork);
+            }
+        <RIGHT_BRACKET>
+    | LOOKAHEAD(2)
+        <LEFT_BRACKET> <DURATIVE_HTN>
+                [LOOKAHEAD(2) <PARAMETERS> <LEFT_BRACKET> parameters=typed_list(Lexer.VARIABLE) <RIGHT_BRACKET>]
+                taskNetwork = durative_task_network() {
+                taskNetwork.setParameters(parameters);
+                this.parsedProblem.setInitialTaskNetwork(taskNetwork);
+                this.parsedProblem.addRequirement(RequireKey.DURATIVE_ACTIONS);
+            }
+       <RIGHT_BRACKET>
+    )
+}
 
 Symbol<String> problem_name() :
 { Token t = null; }
@@ -4562,7 +4921,7 @@ void object_declaration() :
                 if (object.getTypes().isEmpty()) {
                     object.addType(Symbol.OBJECT_TYPE);
                 }
-                this.problem.addObject(object);
+                this.parsedProblem.addObject(object);
 			}
 		}
 	} catch(Throwable e) {
@@ -4578,7 +4937,7 @@ void init() :
 	try {
 		left_bracket() <INIT>
 			(LOOKAHEAD(2) exp=init_el() {
-				this.problem.addInitialFact(exp);
+				this.parsedProblem.addInitialFact(exp);
 			})*
 		right_bracket()
 	} catch(Throwable e) {
@@ -4593,18 +4952,22 @@ Expression<String> init_el() :
 }
 {
 	(
-		LOOKAHEAD(3, {this.isRequirement(RequireKey.TIMED_INITIAL_LITERALS)}) exp=timed_literal()
+		LOOKAHEAD(3) // RequireKey.TIMED_INITIAL_LITERALS
+		    exp=timed_literal() {
+		        this.parsedProblem.addRequirement(RequireKey.TIMED_INITIAL_LITERALS);
+		    }
 	|	LOOKAHEAD(2) exp=literal(Lexer.CONSTANT)
-	|	LOOKAHEAD(2, {this.isRequirement(RequireKey.FLUENTS)
-			|| this.isRequirement(RequireKey.NUMERIC_FLUENTS)
-			|| this.isRequirement(RequireKey.OBJECT_FLUENTS)
-			|| this.isRequirement(RequireKey.ACTION_COSTS)}) exp=equal_init_el()
+	|	LOOKAHEAD(2) // RequireKey.NUMERIC_FLUENTS
+	        exp=init_numeric_function_assignment() {
+	            this.parsedProblem.addRequirement(RequireKey.NUMERIC_FLUENTS);
+	        }
+	     // Missing object fluents case
 	) {
 		return exp;
 	}
 }
 
-Expression<String> equal_init_el() :
+Expression<String> init_numeric_function_assignment() :
 {
 	Expression<String> exp = new Expression<String>(Connector.FN_ATOM);
 	Expression<String> op1, op2;
@@ -4642,7 +5005,6 @@ Expression<String> timed_literal() :
 	}
 }
 
-
 void goal() :
 {
 }
@@ -4655,21 +5017,11 @@ void goal() :
 void pddl_goal() :
 {
 	Expression<String> exp = null;
-	Boolean goal_utilities = false;
-	if (this.isRequirement(RequireKey.GOAL_UTILITIES)
-			&& !this.isRequirement(RequireKey.PREFERENCES)) {
-		this.getRequirements().add(RequireKey.PREFERENCES);
-		goal_utilities = true;
-	}
-
 }
 {
 	try {
 		exp=pre_gd() {
-			this.problem.setGoal(exp);
-			if (goal_utilities) {
-				this.getRequirements().remove(RequireKey.PREFERENCES);
-			}
+			this.parsedProblem.setGoal(exp);
 	   	}
 	} catch(Throwable e) {
 		this.error(e, token.beginLine, token.beginColumn);
@@ -4685,11 +5037,7 @@ void pddl_const(int type) :
 		left_bracket() <CONSTRAINTS>
 			conGD=pref_con_gd()
 		right_bracket() {
-			if (type == Lexer.PARSER_DOMAIN) {
-				this.domain.setConstraints(conGD);
-			} else {
-				this.problem.setConstraints(conGD);
-			}
+			this.parsedProblem.setConstraints(conGD);
 		}
 	} catch(Throwable e) {
 		this.error(e, token.beginLine, token.beginColumn);
@@ -4704,10 +5052,14 @@ Expression<String> pref_con_gd() :
 {
 	(	LOOKAHEAD(2)
 			exp=and_pref_con_gd()
-	|	LOOKAHEAD(2, {this.isRequirement(RequireKey.UNIVERSAL_PRECONDITIONS)})
-			exp=forall_pref_con_gd()
-	| 	LOOKAHEAD(2, {this.isRequirement(RequireKey.PREFERENCES)})
-			exp=named_pref_con_gd()
+	|	LOOKAHEAD(2) // RequireKey.UNIVERSAL_PRECONDITIONS
+			exp=forall_pref_con_gd() {
+			     this.parsedProblem.addRequirement(RequireKey.UNIVERSAL_PRECONDITIONS);
+			}
+	| 	LOOKAHEAD(2) // RequireKey.PREFERENCES
+			exp=named_pref_con_gd() {
+			    this.parsedProblem.addRequirement(RequireKey.PREFERENCES);
+			}
 	|	LOOKAHEAD(2)
 			exp=con_gd()
 	) {
@@ -4782,7 +5134,7 @@ void metric_spec() :
 		(	LOOKAHEAD(3) exp=maximize()
 		| 	LOOKAHEAD(3) exp=minimize()
 		) {
-          	this.problem.setMetric(exp);
+          	this.parsedProblem.setMetric(exp);
         }
 	} catch(Throwable e) {
 		this.error(e, token.beginLine, token.beginColumn);
@@ -4861,6 +5213,7 @@ Expression<String> violated_pref_exp() :
 	}
 }
 
+// Could be factorized with f_head
 Expression<String> constant_f_head() :
 {
 	Expression<String> exp = new Expression<String>(Connector.FN_HEAD);

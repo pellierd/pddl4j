@@ -48,6 +48,11 @@ public class DefaultParsedProblem implements ParsedDomain, ParsedProblem {
     private Set<RequireKey> requirements;
 
     /**
+     * The set of declared requirements.
+     */
+    private Set<RequireKey> declaredRequirements;
+
+    /**
      * The list of types declared in the domain.
      */
     private List<TypedSymbol<String>> types;
@@ -139,6 +144,7 @@ public class DefaultParsedProblem implements ParsedDomain, ParsedProblem {
         // Attributes of a domain
         this.domainName = domain;
         this.requirements = new LinkedHashSet<>();
+        this.declaredRequirements = new LinkedHashSet<>();
         this.types = new ArrayList<>();
         this.types.add(new TypedSymbol<String>(Symbol.OBJECT_TYPE));
         this.constants = new ArrayList<>();
@@ -162,14 +168,12 @@ public class DefaultParsedProblem implements ParsedDomain, ParsedProblem {
     /**
      * Creates a new problem with a specific problem and domain.
      *
-     * @param problem the name of the problem.
      * @param domain the name of the domain.
+     * @param problem the name of the problem.
      */
-    public DefaultParsedProblem(final Symbol<String> problem, final Symbol<String> domain) {
+    public DefaultParsedProblem(final Symbol<String> domain, final Symbol<String> problem) {
         this(domain);
         this.problemName = problem;
-        this.requirements = new LinkedHashSet<>();
-        this.objects = new ArrayList<>();
         this.initialTaskNetwork = null;
         this.initialFacts = new ArrayList<>();
         this.goal = null;
@@ -185,9 +189,10 @@ public class DefaultParsedProblem implements ParsedDomain, ParsedProblem {
      */
     public DefaultParsedProblem(final ParsedDomain domain, ParsedProblem problem) {
         this(domain.getDomainName(), problem.getProblemName());
-        this.requirements = new LinkedHashSet<>();
         this.requirements.addAll(domain.getRequirements());
         this.requirements.addAll(problem.getRequirements());
+        this.declaredRequirements.addAll(domain.getDeclaredRequirements());
+        this.declaredRequirements.addAll(problem.getDeclaredRequirements());
 
         for (TypedSymbol<String> type : domain.getTypes()) {
             this.addType(type);
@@ -266,6 +271,25 @@ public class DefaultParsedProblem implements ParsedDomain, ParsedProblem {
      */
     public final boolean addRequirement(final RequireKey requirement) {
         return this.requirements.add(requirement);
+    }
+
+    /**
+     * Returns the set of declared requirements.
+     *
+     * @return the set of declared requirements.
+     */
+    public Set<RequireKey> getDeclaredRequirements() {
+        return this.declaredRequirements;
+    }
+
+    /**
+     * Adds a declared requirement to the domain.
+     *
+     * @param requirement the declared requirement to add.
+     * @return <code>true</code> if the rdeclared equirement was added; <code>false</code> otherwise.
+     */
+    public boolean addDeclaredRequirement(final RequireKey requirement) {
+        return this.declaredRequirements.add(requirement);
     }
 
     /**

@@ -150,27 +150,23 @@ public interface Problem extends Serializable, AtomicFormulaSimplifier<Integer> 
     List<Task> getTasks();
 
     /**
-     * 
      * Returns the relevant operators for the tasks of the problem. The method
      * return {@code null} if the problem is
      * not hierarchical.
-     * 
-     * Warning a task may have many resolvers event primitives tasks.
-     * </p>
-     * 
-     * The resolvers returned are indexes of operators. To get the list of resolvers
-     * of a specific task {@code t} just
-     * 
-     * write:
-     * 
+     *
+     * <p>Warning a task may have many resolvers event primitives tasks.</p>
+     *
+     * <p>The resolvers returned are indexes of operators. To get the list of resolvers
+     * of a specific task {@code t} just write:</p>
+     *
      * <pre>{@code
      *     List<Integer> resolvers = problem.getTaskResolvers().get(t)
-     * 
+     *
      * }</pre>
-     * 
-     * Two case must be considered.
+     *
+     * <p>Two case must be considered.
      * <ul>
-     * 
+     *
      * <li>If the task {@code t} is primitive, i.e., {@code problem.getTask(t).isPr
      * mtive()}
      * returns true, the list of resolvers contains either indexes of acti
@@ -191,9 +187,8 @@ public interface Problem extends Serializable, AtomicFormulaSimplifier<Integer> 
      * negative the index represents a durative method.
      * To get the corresponding durative method just use
      * {@code problem.getDurativeMethods(-index - 1)}.</li>
-     * 
-     * </ul>
-     * 
+     * </ul></p>
+     *
      * @return the relevant operators for a task.
      */
     List<List<Integer>> getTaskResolvers();
@@ -220,7 +215,6 @@ public interface Problem extends Serializable, AtomicFormulaSimplifier<Integer> 
     TaskNetwork getInitialTaskNetwork();
 
     /**
-     * 
      * Returns <code>true</code> if this problem is solvable. It is not because t
      * e method returns <code>true</code>
      * that the problem is solvable. It just means that instantiation process can
@@ -287,7 +281,7 @@ public interface Problem extends Serializable, AtomicFormulaSimplifier<Integer> 
     /**
      * Returns a string representation of a hierarchical decomposition of plan.
      *
-     * 
+     *
      * @param hierarchy the hierarchical decomposition to convert into string re
      *                  resention.
      * @return the string representation of the he hierarchical decomposition in
@@ -352,7 +346,6 @@ public interface Problem extends Serializable, AtomicFormulaSimplifier<Integer> 
     String toString(final ConditionalEffect effect);
 
     /**
-     * 
      * Returns a short string representation of the specified operator, i.e., its
      * name and its
      * instantiated parameters. This method can be used for actions and methods.
@@ -363,7 +356,6 @@ public interface Problem extends Serializable, AtomicFormulaSimplifier<Integer> 
     String toShortString(final AbstractInstantiatedOperator operator);
 
     /**
-     * 
      * Simply an atomic formula based on the inertia and the initial state of the p
      * oblem. The atomic formula in
      * parameter must be an expression of type ATOM. The simplification can be done
@@ -377,7 +369,6 @@ public interface Problem extends Serializable, AtomicFormulaSimplifier<Integer> 
     boolean simplify(final Expression<Integer> atom);
 
     /**
-     * 
      * Returns true if the problem is totally ordered. The method returns tr
      * e if the problem is not hierarchical, i.e.,
      * contains no methods durative or not and no no initial task network. A hiera

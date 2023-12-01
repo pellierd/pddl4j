@@ -148,12 +148,12 @@ test {
     includes = [
             '**/PDDLParserTest.class',
             '**/HDDLParserTest.class',
-            //'**/ADLProblemInstantiationTest.class',
-            //'**/HTNProblemInstantiationTest.class',
+            '**/ADLProblemInstantiationTest.class',
+            '**/HTNProblemInstantiationTest.class',
             //'**/TemporalProblemInstantiationTest.class',
             '**/HSPTest.class',
-            '**/FFTest.class',
-            '**/GSPTest.class',
+            //'**/FFTest.class',
+            //'**/GSPTest.class',
             '**/TFDTest.class',
             '**/PFDTest.class'
     ]
