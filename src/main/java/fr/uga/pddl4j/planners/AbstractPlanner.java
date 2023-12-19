@@ -402,7 +402,6 @@ public abstract class AbstractPlanner implements Planner {
         // Encodes and instantiates the problem in a compact representation
 
         begin = System.currentTimeMillis();
-
         Problem pb = this.instantiate(parsedProblem);
         this.getStatistics().setTimeToEncode(System.currentTimeMillis() - begin);
         this.getStatistics().setMemoryUsedForProblemRepresentation(GraphLayout.parseInstance(pb).totalSize());

@@ -464,10 +464,10 @@ public final class Parser implements Callable<Integer> {
         // Parse and check the problem
         ParsedProblem pddlProblem = null;
         if (pddlDomain != null) {
-            this.parseProblem(problem,
+            pddlProblem = this.parseProblem(problem,
                 pddlDomain.getDeclaredRequirements(), pddlDomain.getRequirements());
         } else {
-            this.parseProblem(problem);
+            pddlProblem = this.parseProblem(problem);
         }
         return (pddlDomain != null && pddlProblem != null) ? new DefaultParsedProblem(pddlDomain, pddlProblem) : null;
     }
