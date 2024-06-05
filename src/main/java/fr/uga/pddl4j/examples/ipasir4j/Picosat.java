@@ -29,7 +29,7 @@ import fr.uga.pddl4j.examples.ipasir4j.JNAIpasir;
 
 public class Picosat {
 
-	private final static JNAIpasir PICOSAT_JNA = Native.load("picosat",
+	private final static JNAIpasir PICOSAT_JNA = Native.load("./lib/libpicosat.so",
 			JNAIpasir.class);
 
 	public static IpasirSolver createSolver() {

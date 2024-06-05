@@ -155,7 +155,8 @@ test {
             //'**/FFTest.class',
             //'**/GSPTest.class',
             '**/TFDTest.class',
-            '**/PFDTest.class'
+            '**/PFDTest.class',
+            '**/IpasirEncodingTest.class'
     ]
 
 }
