@@ -1,9 +1,10 @@
 package fr.uga.pddl4j.examples;
 
-import fr.uga.pddl4j.examples.ipasir4j.IpasirSolver;
-import fr.uga.pddl4j.examples.ipasir4j.Picosat;
-import fr.uga.pddl4j.examples.ipasir4j.SolverTerminatedException;
 import fr.uga.pddl4j.parser.*;
+import fr.uga.pddl4j.problem.DefaultProblem;
+import fr.uga.pddl4j.problem.Problem;
+
+import java.io.FileWriter;
 
 public class SATSolverExample {
 
@@ -34,30 +35,19 @@ public class SATSolverExample {
                     System.out.println(m.toString());
                 }
             } else {
-                encodeSAT(parsedProblem);
+                final Problem problem = new DefaultProblem(parsedProblem);
+                problem.instantiate();
+                SATEncodingIpasir encoding = new SATEncodingIpasir(problem, 60);
+
+                FileWriter fileWriter = new FileWriter("testOutput.temp");
+                if (encoding.isSatisfiable()) fileWriter.write("Satisfiable\n");
+                else fileWriter.write("Unsatisfiable\n");
+                fileWriter.write(encoding.getPlan());
+                fileWriter.close();
             }
             // This exception could happen if the domain or the problem does not exist
         } catch (Throwable t) {
             t.printStackTrace();
-        }
-    }
-
-
-    public static void encodeSAT(DefaultParsedProblem parsedProblem) {
-        //final Problem problem = new DefaultProblem(parsedProblem);
-        //problem.instantiate();
-
-        //Initial state
-        //final BitVector positiveFluents = problem.getInitialState().getPositiveFluents();
-
-        IpasirSolver solver = Picosat.createSolver();
-
-        solver.add(1);
-        solver.add(0);
-        try {
-            System.out.println(solver.isSatisfiable());
-        } catch (SolverTerminatedException e) {
-            e.printStackTrace();
         }
     }
 }
