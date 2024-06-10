@@ -1,8 +1,8 @@
-package fr.uga.pddl4j.examples.ipasir4j;
+package fr.uga.pddl4j.planners.sat.solvers;
 
 /*-
  * #%L
- * Java binidngs for the IPASIR C interface
+ * Java Bindings for the Minisat solver
  * $Id:$
  * $HeadURL:$
  * %%
@@ -22,14 +22,18 @@ package fr.uga.pddl4j.examples.ipasir4j;
  * #L%
  */
 
-/**
- * An exception indicating that an {@link IpasirSolver} has been terminated.
- *
- * @author Yevgeny Kazakov
- *
- * @see IpasirSolver#isSatisfiable()
- * @see IpasirSolver#setTerminate(TerminationRequest)
- */
-public class SolverTerminatedException extends Exception {
-	private static final long serialVersionUID = 8433586158368519978L;
+import com.github.liveontologies.ipasir4j.IpasirNativeSolver;
+import com.github.liveontologies.ipasir4j.IpasirSolver;
+import com.github.liveontologies.ipasir4j.JNAIpasir;
+import com.sun.jna.Native;
+
+public class Picosat {
+
+	private final static JNAIpasir PICOSAT_JNA = Native.load("./lib/libpicosat.so",
+			JNAIpasir.class);
+
+	public static IpasirSolver createSolver() {
+		return new IpasirNativeSolver(PICOSAT_JNA);
+	}
+
 }
