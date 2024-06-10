@@ -34,6 +34,7 @@ dependencies {
     implementation 'info.picocli:picocli:4.6.2'
     annotationProcessor 'info.picocli:picocli-codegen:4.6.2'
     implementation 'com.sun.jna:jna:1.0.0'
+    implementation 'com.github.liveontologies.ipasir4j:ipasir4j:1.0.0'
 }
 
 
@@ -156,7 +157,7 @@ test {
             //'**/GSPTest.class',
             '**/TFDTest.class',
             '**/PFDTest.class',
-            '**/IpasirEncodingTest.class'
+            '**/SATTest.class'
     ]
 
 }

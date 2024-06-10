@@ -21,6 +21,7 @@ import fr.uga.pddl4j.plan.Plan;
 
 import fr.uga.pddl4j.planners.htn.stn.PFD;
 import fr.uga.pddl4j.planners.htn.stn.TFD;
+import fr.uga.pddl4j.planners.sat.GenericSATPlanner;
 import fr.uga.pddl4j.planners.statespace.FF;
 import fr.uga.pddl4j.planners.statespace.GSP;
 import fr.uga.pddl4j.planners.statespace.HSP;
@@ -110,6 +111,11 @@ public interface Planner extends Serializable, Callable<Integer> {
          * PFD (Partial-order Forward Decomposition) planner.
          */
         PFD,
+
+        /**
+         * SAT planner, using a SAT solver
+         */
+        SAT,
     }
 
     /**
@@ -302,6 +308,8 @@ public interface Planner extends Serializable, Callable<Integer> {
                 return new TFD(configuration);
             case PFD:
                 return new PFD(configuration);
+            case SAT:
+                return new GenericSATPlanner(configuration);
             default:
                 return null;
         }
