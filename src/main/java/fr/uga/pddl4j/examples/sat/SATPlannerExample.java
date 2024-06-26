@@ -1,15 +1,19 @@
-package fr.uga.pddl4j.planners.sat;
+package fr.uga.pddl4j.examples.sat;
 
+import com.github.liveontologies.ipasir4j.IpasirSolver;
 import fr.uga.pddl4j.planners.PlannerConfiguration;
+import fr.uga.pddl4j.planners.ProblemNotSupportedException;
+import fr.uga.pddl4j.planners.sat.AbstractSATPlanner;
+import fr.uga.pddl4j.planners.sat.encodings.SATEncoding;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import picocli.CommandLine;
 
 /**
- * A class used to create a new SAT planner
+ * An example of an implementation of a SAT planner that can be used with the PDDL4J library
  */
-@CommandLine.Command(name = "GenericSATPlanner",
-    version = "GenericSATPlanner 1.0",
+@CommandLine.Command(name = "SATPlannerExample",
+    version = "SATPlannerExample 1.0",
     description = "Solves a specified planning problem using a SAT solver.",
     sortOptions = false,
     mixinStandardHelpOptions = true,
@@ -18,16 +22,16 @@ import picocli.CommandLine;
     descriptionHeading = "%nDescription:%n%n",
     parameterListHeading = "%nParameters:%n",
     optionListHeading = "%nOptions:%n")
-public class GenericSATPlanner extends AbstractSATPlanner {
+public class SATPlannerExample extends AbstractSATPlanner {
     /**
      * The class logger
      */
-    private static final Logger LOGGER = LogManager.getLogger(GenericSATPlanner.class.getName());
+    private static final Logger LOGGER = LogManager.getLogger(SATPlannerExample.class.getName());
 
     /**
      * Creates a new SAT planner with the default configuration
      */
-    public GenericSATPlanner() {
+    public SATPlannerExample() {
         super();
     }
 
@@ -35,15 +39,27 @@ public class GenericSATPlanner extends AbstractSATPlanner {
      * Creates a new SAT planner with the specified configuration
      * @param configuration     the configuration of the planner
      */
-    public GenericSATPlanner(final PlannerConfiguration configuration) {
+    public SATPlannerExample(final PlannerConfiguration configuration) {
         super(configuration);
+    }
+
+    @Override
+    public SATEncoding getSATEncodingFromName(String encodingName) throws ProblemNotSupportedException {
+        if (encodingName.equals("EXAMPLE")) return new SATEncodingExample();
+        return super.getSATEncodingFromName(encodingName);
+    }
+
+    @Override
+    public IpasirSolver getSATSolverFromName(String solverName) throws ProblemNotSupportedException {
+        if (solverName.equals("MERGESAT")) return MergesatWrapper.createSolver();
+        return super.getSATSolverFromName(solverName);
     }
 
     /**
      * Launches the planner from the command line
      * For example :
      *      java -cp classes:lib/pddl4j-4.0.0.jar
-     *              fr.uga.pddl4j.planners.sat.GenericSATPlanner
+     *              fr.uga.pddl4j.examples.sat.SATPlannerExample
      *              domain.pddl
      *              problem.pddl
      *              -s PICOSAT
@@ -61,7 +77,7 @@ public class GenericSATPlanner extends AbstractSATPlanner {
      */
     public static void main(String[] args) {
         try {
-            final GenericSATPlanner planner = new GenericSATPlanner();
+            final SATPlannerExample planner = new SATPlannerExample();
             CommandLine cmd = new CommandLine(planner);
             cmd.execute(args);
         } catch (IllegalArgumentException e) {

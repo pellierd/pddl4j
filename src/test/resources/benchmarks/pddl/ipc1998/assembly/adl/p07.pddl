@@ -1,4 +1,5 @@
 (define (problem assem-x-7)
+import org.w3c.dom.css.ElementCSSInlineStyle;
    (:domain assembly)
    (:objects unit kludge-4 connector-5 gimcrack-6 mount-7
              sprocket-3 foobar device-1 socket-2 wire kludge whatsis plug

@@ -4,22 +4,16 @@ import com.github.liveontologies.ipasir4j.IpasirSolver;
 import com.github.liveontologies.ipasir4j.SolverTerminatedException;
 import fr.uga.pddl4j.plan.Plan;
 import fr.uga.pddl4j.plan.SequentialPlan;
-import fr.uga.pddl4j.planners.sat.solvers.SATSolver;
 import fr.uga.pddl4j.problem.Problem;
 import fr.uga.pddl4j.problem.operator.Action;
 import fr.uga.pddl4j.util.BitVector;
 
+import java.util.HashSet;
+
 /**
  * An abstract class defining all general elements used to create new SAT encodings
  */
-public abstract class AbstractSATEncoding implements Encoding {
-    /**
-     * Defines the available SAT encodings
-     */
-    public enum SATEncoding {
-        DEFAULT
-    }
-
+public abstract class AbstractSATEncoding implements SATEncoding {
     /**
      * Internal variable used for the translation of actions into DIMACS notation (to add them to a solver)
      * Example :  If we have 30 fluents and 10 actions, the fluents will be encoded between 0 and 29, and the actions between 30 and 39. So, we will have actionBeginningIndex = 30.
@@ -33,22 +27,58 @@ public abstract class AbstractSATEncoding implements Encoding {
      * The last problem this encoding has been used with (is null if no solving has been tried yet)
      */
     private Problem problem;
+    /**
+     * A set containing all added clauses
+     */
+    private HashSet<HashSet<Integer>> addedClauses;
+    /**
+     * A set containing all assumed clauses
+     */
+    private HashSet<Integer> assumedClauses;
+    /**
+     * A string builder used to get a readable output for debugging (with comments), for added clauses
+     */
+    private StringBuilder dimacsDebugStringBuilder;
+    /**
+     * A string builder used to get a readable output for debugging (with comments), for assumed clauses
+     */
+    private StringBuilder dimacsDebugStringBuilderAssumed;
+    /**
+     * A set containing the clause being currently built
+     */
+    private HashSet<Integer> currentClause;
 
     @Override
-    public Plan solve(Problem problem, SATSolver solver, int maxPlanLength) throws SolverTerminatedException {
-        solverInstance = SATSolver.getNewSolverInstance(solver);
+    public Plan solve(Problem problem, IpasirSolver solver, int maxPlanLength) throws SolverTerminatedException {
+        solverInstance = solver;
         this.problem = problem;
         actionBeginningIndex = problem.getFluents().size();
+        addedClauses = new HashSet<>();
+        assumedClauses = new HashSet<>();
+        currentClause = new HashSet<>();
+        dimacsDebugStringBuilder = new StringBuilder();
+        dimacsDebugStringBuilderAssumed = new StringBuilder();
 
+        dimacsDebugStringBuilder.append("c Initial state:\n");
+        dimacsDebugStringBuilderAssumed.append("c Initial state:\n");
         encodeInitialState();
         for (int planLength = 0; planLength <= maxPlanLength; planLength++) {
+            dimacsDebugStringBuilder.append("c Goal (plan length ").append(planLength).append("):\n");
+            dimacsDebugStringBuilderAssumed.append("c Goal (plan length ").append(planLength).append("):\n");
             encodeGoal(planLength);
             if (planLength > 0) {
+                dimacsDebugStringBuilder.append("c Actions (plan length ").append(planLength).append("):\n");
+                dimacsDebugStringBuilderAssumed.append("c Actions (plan length ").append(planLength).append("):\n");
                 encodeActions(planLength - 1);
+                dimacsDebugStringBuilder.append("c Frame axioms (plan length ").append(planLength).append("):\n");
+                dimacsDebugStringBuilderAssumed.append("c Frame axioms (plan length ").append(planLength).append("):\n");
                 encodeFrameAxioms(planLength - 1);
             }
 
             if (solverInstance.isSatisfiable()) return getPlan(planLength);
+            assumedClauses = new HashSet<>(); //Assumed clauses are reinitialized each time;
+            currentClause = new HashSet<>(); //It should be void at this point, but just to be sure
+            dimacsDebugStringBuilderAssumed = new StringBuilder();
         }
         return null;
     }
@@ -91,7 +121,10 @@ public abstract class AbstractSATEncoding implements Encoding {
      * @param positive      whether the fluent is negated (false) or not (true)
      */
     protected void assumeFluent(int fluentIndex, int state, boolean positive) {
-        solverInstance.assume(DIMACSNotation(fluentIndex, state, positive));
+        int dimacs = DIMACSNotation(fluentIndex, state, positive);
+        solverInstance.assume(dimacs);
+        assumedClauses.add(dimacs);
+        dimacsDebugStringBuilderAssumed.append(dimacs).append("\n");
     }
 
     /**
@@ -103,7 +136,10 @@ public abstract class AbstractSATEncoding implements Encoding {
      */
     protected void assumeAction(int actionIndex, int state, boolean positive) {
         actionIndex += actionBeginningIndex;
-        solverInstance.assume(DIMACSNotation(actionIndex, state, positive));
+        int dimacs = DIMACSNotation(actionIndex, state, positive);
+        solverInstance.assume(dimacs);
+        assumedClauses.add(dimacs);
+        dimacsDebugStringBuilderAssumed.append(dimacs).append("\n");
     }
 
     /**
@@ -114,7 +150,10 @@ public abstract class AbstractSATEncoding implements Encoding {
      * @param positive      whether the fluent is negated (false) or not (true)
      */
     protected void addFluent(int fluentIndex, int state, boolean positive) {
-        solverInstance.add(DIMACSNotation(fluentIndex, state, positive));
+        int dimacs = DIMACSNotation(fluentIndex, state, positive);
+        solverInstance.add(dimacs);
+        currentClause.add(dimacs);
+        dimacsDebugStringBuilder.append(dimacs).append(" ");
     }
 
     /**
@@ -126,7 +165,10 @@ public abstract class AbstractSATEncoding implements Encoding {
      */
     protected void addAction(int actionIndex, int state, boolean positive) {
         actionIndex += actionBeginningIndex;
-        solverInstance.add(DIMACSNotation(actionIndex, state, positive));
+        int dimacs = DIMACSNotation(actionIndex, state, positive);
+        solverInstance.add(dimacs);
+        currentClause.add(dimacs);
+        dimacsDebugStringBuilder.append(dimacs).append(" ");
     }
 
     /**
@@ -135,6 +177,9 @@ public abstract class AbstractSATEncoding implements Encoding {
      */
     protected void endClause() {
         solverInstance.add(0);
+        addedClauses.add(currentClause);
+        currentClause = new HashSet<>();
+        dimacsDebugStringBuilder.append(0).append("\n");
     }
 
     /**
@@ -198,5 +243,52 @@ public abstract class AbstractSATEncoding implements Encoding {
      */
     protected Problem getProblem() {
         return problem;
+    }
+
+    /**
+     * Two encodings are supposed equal iff :
+     *  - either they are the same object
+     *  - or they are instances of the same class, and have the same clauses in their last encoding instance (not necessarily the same problem or the same solver)
+     *  Whether or not a clause was added or assumed is irrelevant if the clause is present in the end for both.
+     * @param obj   the compared object
+     * @return      whether they are the same encoding or not
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj != null && obj.getClass() == getClass()) {
+            AbstractSATEncoding other = (AbstractSATEncoding) obj;
+            HashSet<HashSet<Integer>> allClauses = new HashSet<>(addedClauses);
+            for (Integer i : assumedClauses) {
+                allClauses.add(new HashSet<>(i));
+            }
+            HashSet<HashSet<Integer>> allClausesOther = new HashSet<>(other.addedClauses);
+            for (Integer i : other.assumedClauses) {
+                allClausesOther.add(new HashSet<>(i));
+            }
+            return allClauses.equals(allClausesOther);
+        }
+        return false;
+    }
+
+    @Override
+    public String toString() {
+        return "c Encoding of " + this.getClass() + ", used with solver of signature " + solverInstance.getSignature() + "\n" +
+            "c ***************\n" +
+            "c Added clauses:\n" +
+            "c ***************\n" +
+            dimacsDebugStringBuilder +
+            "c ***************\n" +
+            "c Last assumed clauses:\n" +
+            "c ***************\n" +
+            dimacsDebugStringBuilderAssumed;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 21;
+        hash = 31*hash + assumedClauses.hashCode();
+        hash = 31*hash + addedClauses.hashCode();
+        return hash;
     }
 }
