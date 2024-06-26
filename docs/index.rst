@@ -60,6 +60,7 @@ The library contains:
    writing_your_own_planner
    using_the_pddl_parser
    instantiating_planning_problems
+   sat_solvers
    api_documentation
    download
    Issues <https://github.com/pellierd/pddl4j/issues?q=>

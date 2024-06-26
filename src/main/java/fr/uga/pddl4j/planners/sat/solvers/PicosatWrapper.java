@@ -27,7 +27,9 @@ import com.github.liveontologies.ipasir4j.IpasirSolver;
 import com.github.liveontologies.ipasir4j.JNAIpasir;
 import com.sun.jna.Native;
 
-public class Picosat {
+import java.io.Serializable;
+
+public class PicosatWrapper implements Serializable {
 
 	private final static JNAIpasir PICOSAT_JNA = Native.load("./lib/libpicosat.so",
 			JNAIpasir.class);

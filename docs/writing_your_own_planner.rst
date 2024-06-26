@@ -19,7 +19,7 @@ For this tutorial you need:
   *  `Java JDK <https://adoptopenjdk.net/>`_ version 8 or higher is installed.
   * A text editor such as `Sublime <https://www.sublimetext.com>`_ or `Atom <https://atom.io>`_ or IDE such as `Eclipse <https://www.eclipse.org>`_ `NetBean <https://netbeans.org>`_ or `IntelliJ <https://www.jetbrains.com/idea/>`_.
 
-In the following, we will give the commands line so that the tutorial can be done independently of any IDE.
+In the following, we will give the command lines so that the tutorial can be done independently of any IDE.
 
 Step 1. Create a simple Java project with PDDL4J
 ------------------------------------------------
@@ -53,7 +53,7 @@ Step 2. Create the main class of our planner
 --------------------------------------------
 
 Create and edit a file called ``ASP.java`` in the directory ``src/fr/uga/pddl4j/examples/asp``. The skeleton of this
-class is given bellow:
+class is given below:
 
 .. literalinclude:: ../src/main/java/fr/uga/pddl4j/examples/asp/ASP.java
     :language: java
