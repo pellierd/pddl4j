@@ -47,6 +47,10 @@ public abstract class AbstractSATEncoding implements SATEncoding {
      * A set containing the clause being currently built
      */
     private HashSet<Integer> currentClause;
+    /**
+     * The lenth of the last found plan
+     */
+    private int lastPlanLength;
 
     @Override
     public Plan solve(Problem problem, IpasirSolver solver, int maxPlanLength) throws SolverTerminatedException {
@@ -75,7 +79,10 @@ public abstract class AbstractSATEncoding implements SATEncoding {
                 encodeFrameAxioms(planLength - 1);
             }
 
-            if (solverInstance.isSatisfiable()) return getPlan(planLength);
+            if (solverInstance.isSatisfiable()) {
+                lastPlanLength = planLength;
+                return getPlan(planLength);
+            }
             assumedClauses = new HashSet<>(); //Assumed clauses are reinitialized each time;
             currentClause = new HashSet<>(); //It should be void at this point, but just to be sure
             dimacsDebugStringBuilderAssumed = new StringBuilder();
@@ -124,7 +131,7 @@ public abstract class AbstractSATEncoding implements SATEncoding {
         int dimacs = DIMACSNotation(fluentIndex, state, positive);
         solverInstance.assume(dimacs);
         assumedClauses.add(dimacs);
-        dimacsDebugStringBuilderAssumed.append(dimacs).append("\n");
+        dimacsDebugStringBuilderAssumed.append(dimacs).append(" 0\n");
     }
 
     /**
@@ -139,7 +146,7 @@ public abstract class AbstractSATEncoding implements SATEncoding {
         int dimacs = DIMACSNotation(actionIndex, state, positive);
         solverInstance.assume(dimacs);
         assumedClauses.add(dimacs);
-        dimacsDebugStringBuilderAssumed.append(dimacs).append("\n");
+        dimacsDebugStringBuilderAssumed.append(dimacs).append(" 0\n");
     }
 
     /**
@@ -273,7 +280,9 @@ public abstract class AbstractSATEncoding implements SATEncoding {
 
     @Override
     public String toString() {
-        return "c Encoding of " + this.getClass() + ", used with solver of signature " + solverInstance.getSignature() + "\n" +
+        if (problem == null) return "c No problem has been encoded yet!";
+        return "p cnf " + DIMACSNotation(actionBeginningIndex + problem.getActions().size() - 1, lastPlanLength - 1, true) + " " + (addedClauses.size() + assumedClauses.size()) + "\n" +
+            "c Encoding of " + this.getClass() + "\n" +
             "c ***************\n" +
             "c Added clauses:\n" +
             "c ***************\n" +
