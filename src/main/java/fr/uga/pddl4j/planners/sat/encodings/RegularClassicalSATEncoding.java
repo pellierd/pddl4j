@@ -3,17 +3,20 @@ package fr.uga.pddl4j.planners.sat.encodings;
 import fr.uga.pddl4j.problem.operator.ConditionalEffect;
 import fr.uga.pddl4j.util.BitVector;
 
+import java.util.ArrayList;
+
 /**
- * Default encoding for SAT problems
+ * A SAT encoding based on a "regular" encoding for actions and classical frame axioms
  * This encoding is based on chapter 7 of "Automated Planning: theory and practice", from Malik Ghallab, Dana Nau and Paolo Traverso, published by Morgan Kaufmann in 2004.
  */
-public class DefaultSATEncoding extends AbstractSATEncoding {
+public class RegularClassicalSATEncoding extends AbstractSATEncoding {
 
     /**
      * Encodes one action of the problem that may be taken at a given state (between states 0 and planLength - 1).
      * The principle is to encode ([action at state i] \implies [precondition at state i]) for all preconditions, and ([action at state i] \implies [effect at state i + 1]) for all effects.
-     * @param actionIndex   the index of the action in the list of actions of the instantiated problem
-     * @param state         the state where the action is supposed to be chosen
+     *
+     * @param actionIndex the index of the action in the list of actions of the instantiated problem
+     * @param state       the state where the action is supposed to be chosen
      */
     @Override
     public void encodeAction(int actionIndex, int state) {
@@ -40,78 +43,66 @@ public class DefaultSATEncoding extends AbstractSATEncoding {
 
     /**
      * Encodes all axioms necessary to describe the frame of the problem (whose exact nature depends on the specific encoding), at a specific state (between states 0 and planLength - 1)
-     * Please see the two methods used as part of this encoding for more details.
-     * @param state         the state where the axioms are considered
+     * The encoding of these frame axioms is divided into two parts :
+     * - first, for all fluents f and actions a, (f_i and a_i) \implies f_{i + 1}
+     * - second, at least one action is performed : (a_1 or a_2 or ... or a_n)
+     *
+     * @param state the state where the axioms are considered
      */
     @Override
     public void encodeFrameAxioms(int state) {
-        encodeExplanatoryFrameAxioms(state);
-        encodeCompleteExclusionAxioms(state);
-    }
-
-    /**
-     * Encodes the fact that "an action changes only fluents that are in its effects", that is, "if a fluent changes, then one of the actions that have that fluent in its effects has been executed". (Malik Ghallab, Dana Nau and Paolo Traverso ; see documentation of class for full reference)
-     * This means that we encode    ([not fluent_i] and [fluent_{i + 1}] \implies [disjunction of actions whose positive effects contain fluent_{i + 1}])
-     *                              and ([fluent_i] and [not fluent_{i + 1}] \implies [disjunction of actions whose negative effects contain fluent_{i + 1}])
-     * That is, in CNF:
-     *                              ([fluent_i] or [not fluent_{i + 1}] or [disjunction of actions whose positive effects contain fluent_{i + 1}])
-     *                              ([not fluent_i] or [fluent_{i + 1}] or [disjunction of actions whose negative effects contain fluent_{i + 1}])
-     * @param state         the state where the action is supposed to be chosen
-     */
-    private void encodeExplanatoryFrameAxioms(int state) {
         for (int fluentIndex = 0; fluentIndex < getProblem().getFluents().size(); fluentIndex++) {
-            addFluent(fluentIndex, state, true);
-            addFluent(fluentIndex, state + 1, false);
             for (int actionIndex = 0; actionIndex < getProblem().getActions().size(); actionIndex++) {
+                boolean isAnEffect = false;
                 for (ConditionalEffect conditionalEffect : getProblem().getActions().get(actionIndex).getConditionalEffects()) {
                     if (conditionalEffect.getEffect().getPositiveFluents().get(fluentIndex)) {
-                        addAction(actionIndex, state, true);
+                        isAnEffect = true;
                         break;
                     }
-                }
-            }
-            endClause();
-
-            addFluent(fluentIndex, state, false);
-            addFluent(fluentIndex, state + 1, true);
-            for (int actionIndex = 0; actionIndex < getProblem().getActions().size(); actionIndex++) {
-                for (ConditionalEffect conditionalEffect : getProblem().getActions().get(actionIndex).getConditionalEffects()) {
                     if (conditionalEffect.getEffect().getNegativeFluents().get(fluentIndex)) {
-                        addAction(actionIndex, state, true);
+                        isAnEffect = true;
                         break;
                     }
                 }
+                if (!isAnEffect) {
+                    //A true fluent remains true
+                    addFluent(fluentIndex, state, false);
+                    addAction(actionIndex, state, false);
+                    addFluent(fluentIndex, state + 1, true);
+                    endClause();
+
+                    //A false fluent remains false
+                    addFluent(fluentIndex, state, true);
+                    addAction(actionIndex, state, false);
+                    addFluent(fluentIndex, state + 1, false);
+                    endClause();
+                }
             }
-            endClause();
         }
+
+        for (int actionIndex = 0; actionIndex < getProblem().getActions().size(); actionIndex++) {
+            addAction(actionIndex, state, true);
+        }
+        endClause();
     }
 
-    /**
-     * Encodes the fact that only one action can be chosen at the specified state, that is, for all distinct actions a and b, ([not a] or [not b]) for this state
-     * @param state     the specified state
-     */
-    private void encodeCompleteExclusionAxioms(int state) {
-        for (int actionIndex1 = 0; actionIndex1 < getProblem().getActions().size(); actionIndex1++) {
-            for (int actionIndex2 = actionIndex1 + 1; actionIndex2 < getProblem().getActions().size(); actionIndex2++) {
-                addAction(actionIndex1, state, false);
-                addAction(actionIndex2, state, false);
-                endClause();
-            }
-        }
+    @Override
+    protected boolean actionHasBeenChosen(int actionIndex, int state) {
+        return isTrue(actionIndex, state);
     }
 
     /**
      * Encodes [action] \implies [fluent] in a single CNF clause. It is assumed that the clause is empty when called, and it will be empty again at the end of the function.
      *
-     * @param actionIndex i, so that the action is the i-th element of Problem.getActions()
-     * @param fluentIndex i, so that the fluent is the i-th element of Problem.getFluents()
-     * @param actionState the number associated with the state at which the action takes place
-     * @param fluentState the number associated with the state at which the fluent is associated
+     * @param actionIndex       i, so that the action is the i-th element of Problem.getActions()
+     * @param fluentIndex       i, so that the fluent is the i-th element of Problem.getFluents()
+     * @param actionState       the number associated with the state at which the action takes place
+     * @param fluentState       the number associated with the state at which the fluent is associated
+     * @param positiveFluent    whether the fluent is negated (false) or not (true)
      */
     private void encodeActionImpliesFluent(int actionIndex, int fluentIndex, int actionState, int fluentState, boolean positiveFluent) {
         addAction(actionIndex, actionState, false);
         addFluent(fluentIndex, fluentState, positiveFluent);
         endClause();
     }
-
 }
