@@ -99,7 +99,7 @@ public abstract class AbstractSATEncoding implements SATEncoding {
         final Plan plan = new SequentialPlan();
         for (int state = 0; state < planLength; state++) {
             for (int actionIndex = 0; actionIndex < problem.getActions().size(); actionIndex++) {
-                if (solverInstance.val(DIMACSNotation(actionBeginningIndex + actionIndex, state, true)) > 0) {
+                if (actionHasBeenChosen(actionIndex, state)) {
                     Action action = problem.getActions().get(actionIndex);
                     plan.add(state, action);
                     break;
@@ -251,6 +251,27 @@ public abstract class AbstractSATEncoding implements SATEncoding {
     protected Problem getProblem() {
         return problem;
     }
+
+    /**
+     * Returns whether or not the index passed as argument has been solved as true. It is assumed that the problem has already been solved
+     * @param actionindex       the index added using addAction
+     * @param state             the state with which the index was added
+     * @return                  whether the literal is true or false
+     */
+    protected boolean isTrue(int actionindex, int state) {
+        actionindex += actionBeginningIndex;
+        int DIMACSLiteral = DIMACSNotation(actionindex, state, true);
+        return solverInstance.val(DIMACSLiteral) > 0;
+    }
+
+    /**
+     * A method determining, by means of the results of the solver, whether or not an action has been chosen
+     * The specific implementation of this method depends on the mapping between actions and the exact way an action is encoded. For example, if the action A is encoded using the indexes 2 and 3 that both have to be true for A to be considered as chosen, then this method should return true iff the solver has assigned the value "true" to both the indexes 2 and 3.
+     * @param actionIndex   the index of the action that is to be tested
+     * @param state         the state at which the action is to be tested
+     * @return              true if the action has been chosen at this specific state, else false
+     */
+    protected abstract boolean actionHasBeenChosen(int actionIndex, int state);
 
     /**
      * Two encodings are supposed equal iff :

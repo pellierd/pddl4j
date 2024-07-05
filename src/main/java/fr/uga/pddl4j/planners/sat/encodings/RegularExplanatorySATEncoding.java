@@ -1,46 +1,13 @@
-package fr.uga.pddl4j.examples.sat;
+package fr.uga.pddl4j.planners.sat.encodings;
 
-import fr.uga.pddl4j.planners.sat.encodings.AbstractSATEncoding;
 import fr.uga.pddl4j.problem.operator.ConditionalEffect;
 import fr.uga.pddl4j.util.BitVector;
 
 /**
- * An example of an implementation of a SAT encoding that can be used with the PDDL4J library
+ * Default encoding for SAT problems, based on regular encoding of actions and explanatory frame axioms
+ * This encoding is based on chapter 7 of "Automated Planning: theory and practice", from Malik Ghallab, Dana Nau and Paolo Traverso, published by Morgan Kaufmann in 2004.
  */
-public class SATEncodingExample extends AbstractSATEncoding {
-    /**
-     * Encodes the initial state of the problem, as a series of unary clauses containing each the status (true or false) of a fluent at state 0. All fluents are encoded.
-     * The encoding of the initial state has to be done once and is persistent.
-     */
-    @Override
-    protected void encodeInitialState() {
-        final BitVector initialPositiveFluents = getProblem().getInitialState().getPositiveFluents();
-        //All fluents not positive are assumed to be negative by default
-        for (int fluentIndex = 0; fluentIndex < getProblem().getFluents().size(); fluentIndex++) {
-            addFluent(fluentIndex, 0, initialPositiveFluents.get(fluentIndex));
-            endClause();
-        }
-    }
-
-    /**
-     * Encodes the goal of the problem, as a series of unary clauses containing each the status (true or false) of a fluent at state planLength (at the last state). Only fluents specified in the problem are encoded.
-     * The encoding of the goal is NOT persistent (it uses the ipasir function "assume") and must therefore be done again each time a satisfiability test is done (that is, each time the plan length is increased).
-     * @param planLength    the current length of the plan (that is, the current exact number of actions of a hypothetical plan)
-     */
-    @Override
-    protected void encodeGoal(int planLength) {
-        final BitVector finalPositiveFluents = getProblem().getGoal().getPositiveFluents();
-        final BitVector finalNegativeFluents = getProblem().getGoal().getNegativeFluents();
-        //Here, we care only about fluents that are explicitly specified
-        for (int i = 0; i < getProblem().getFluents().size(); i++) {
-            if (finalPositiveFluents.get(i)) {
-                assumeFluent(i, planLength, true);
-            }
-            if (finalNegativeFluents.get(i)) {
-                assumeFluent(i, planLength, false);
-            }
-        }
-    }
+public class RegularExplanatorySATEncoding extends AbstractSATEncoding {
 
     /**
      * Encodes one action of the problem that may be taken at a given state (between states 0 and planLength - 1).
@@ -80,6 +47,11 @@ public class SATEncodingExample extends AbstractSATEncoding {
     public void encodeFrameAxioms(int state) {
         encodeExplanatoryFrameAxioms(state);
         encodeCompleteExclusionAxioms(state);
+    }
+
+    @Override
+    protected boolean actionHasBeenChosen(int actionIndex, int state) {
+        return isTrue(actionIndex, state);
     }
 
     /**
@@ -126,7 +98,7 @@ public class SATEncodingExample extends AbstractSATEncoding {
     private void encodeCompleteExclusionAxioms(int state) {
         for (int actionIndex1 = 0; actionIndex1 < getProblem().getActions().size(); actionIndex1++) {
             for (int actionIndex2 = actionIndex1 + 1; actionIndex2 < getProblem().getActions().size(); actionIndex2++) {
-                addAction(actionIndex1, state, false); //Adds the negative of the action of index actionIndex1 to the current clause
+                addAction(actionIndex1, state, false);
                 addAction(actionIndex2, state, false);
                 endClause();
             }
@@ -136,10 +108,11 @@ public class SATEncodingExample extends AbstractSATEncoding {
     /**
      * Encodes [action] \implies [fluent] in a single CNF clause. It is assumed that the clause is empty when called, and it will be empty again at the end of the function.
      *
-     * @param actionIndex i, so that the action is the i-th element of Problem.getActions()
-     * @param fluentIndex i, so that the fluent is the i-th element of Problem.getFluents()
-     * @param actionState the number associated with the state at which the action takes place
-     * @param fluentState the number associated with the state at which the fluent is associated
+     * @param actionIndex       i, so that the action is the i-th element of Problem.getActions()
+     * @param fluentIndex       i, so that the fluent is the i-th element of Problem.getFluents()
+     * @param actionState       the number associated with the state at which the action takes place
+     * @param fluentState       the number associated with the state at which the fluent is associated
+     * @param positiveFluent    whether the fluent is negated (false) or not (true)
      */
     private void encodeActionImpliesFluent(int actionIndex, int fluentIndex, int actionState, int fluentState, boolean positiveFluent) {
         addAction(actionIndex, actionState, false);
@@ -147,15 +120,4 @@ public class SATEncodingExample extends AbstractSATEncoding {
         endClause();
     }
 
-    /**
-     * A method determining, by means of the results of the solver, whether or not an action has been chosen
-     * In this case, since an action is encoded using only one variable (equal to its index), it simply checks that this variable has been assigned the value "true" by the solver.
-     * @param actionIndex   the index of the action that is to be tested
-     * @param state         the state at which the action is to be tested
-     * @return              true if the action has been chosen at this specific state, else false
-     */
-    @Override
-    protected boolean actionHasBeenChosen(int actionIndex, int state) {
-        return isTrue(actionIndex, state);
-    }
 }

@@ -5,6 +5,7 @@ import fr.uga.pddl4j.planners.PlannerConfiguration;
 import fr.uga.pddl4j.planners.ProblemNotSupportedException;
 import fr.uga.pddl4j.planners.sat.AbstractSATPlanner;
 import fr.uga.pddl4j.planners.sat.encodings.SATEncoding;
+import fr.uga.pddl4j.planners.sat.solvers.MergesatWrapper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import picocli.CommandLine;
@@ -62,14 +63,14 @@ public class SATPlannerExample extends AbstractSATPlanner {
      *              fr.uga.pddl4j.examples.sat.SATPlannerExample
      *              domain.pddl
      *              problem.pddl
-     *              -s PICOSAT
+     *              -s MERGESAT
      *              -e DEFAULT
      *              -mpl 1000
      *              -t 10
      * Where :
      *      domain.pddl is the domain PDDL file
      *      problem.pddl is the problem PDDL file
-     *      PICOSAT is the SAT solver
+     *      MERGESAT is the SAT solver
      *      DEFAULT is the SAT encoding
      *      1000 is the maximum plan length (maximum number of actions)
      *      10 is the timeout (in seconds)

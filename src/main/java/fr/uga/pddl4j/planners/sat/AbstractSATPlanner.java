@@ -9,8 +9,7 @@ import fr.uga.pddl4j.planners.AbstractPlanner;
 import fr.uga.pddl4j.planners.Planner;
 import fr.uga.pddl4j.planners.PlannerConfiguration;
 import fr.uga.pddl4j.planners.ProblemNotSupportedException;
-import fr.uga.pddl4j.planners.sat.encodings.DefaultSATEncoding;
-import fr.uga.pddl4j.planners.sat.encodings.SATEncoding;
+import fr.uga.pddl4j.planners.sat.encodings.*;
 import fr.uga.pddl4j.planners.sat.solvers.MergesatWrapper;
 import fr.uga.pddl4j.planners.sat.solvers.PicosatWrapper;
 import fr.uga.pddl4j.problem.DefaultProblem;
@@ -54,7 +53,7 @@ public abstract class AbstractSATPlanner extends AbstractPlanner implements SATP
     /**
      * The name of the default SAT solver
      */
-    public static final String DEFAULT_SAT_SOLVER_NAME = "PICOSAT";
+    public static final String DEFAULT_SAT_SOLVER_NAME = "MERGESAT";
 
     /**
      * The name of the chosen SAT solver
@@ -113,8 +112,8 @@ public abstract class AbstractSATPlanner extends AbstractPlanner implements SATP
      * Sets the solver used by the planner
      * @param solverName    the name of the chosen solver
      */
-    @CommandLine.Option(names = {"-s", "--solver"}, defaultValue = "PICOSAT",
-        paramLabel = "<solver>", description = "Sets the SAT solver used to solve the problem (preset PICOSAT).")
+    @CommandLine.Option(names = {"-s", "--solver"}, defaultValue = "MERGESAT",
+        paramLabel = "<solver>", description = "Sets the SAT solver used to solve the problem (preset MERGESAT).")
     public void setSolver(String solverName) {
         this.solverName = solverName;
     }
@@ -169,8 +168,19 @@ public abstract class AbstractSATPlanner extends AbstractPlanner implements SATP
      */
     public SATEncoding getSATEncodingFromName(String encodingName) throws ProblemNotSupportedException {
         switch (this.encodingName) {
+            case "RE":
+            case "REGULAR_EXPLANATORY":
             case "DEFAULT":
-                return  new DefaultSATEncoding();
+                return new RegularExplanatorySATEncoding();
+            case "SSC":
+            case "SIMPLE_SPLITTING_CLASSICAL":
+                return new SimpleSplittingClassicalSATEncoding();
+            case "RC":
+            case "REGULAR_CLASSICAL":
+                return new RegularClassicalSATEncoding();
+            case "BC":
+            case "BITWISE_CLASSICAL":
+                return new BitwiseClassicalSATEncoding();
             default:
                 throw new ProblemNotSupportedException("ERROR: Unknown encoding");
         }
