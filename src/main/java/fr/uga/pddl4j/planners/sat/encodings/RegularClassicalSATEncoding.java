@@ -3,8 +3,6 @@ package fr.uga.pddl4j.planners.sat.encodings;
 import fr.uga.pddl4j.problem.operator.ConditionalEffect;
 import fr.uga.pddl4j.util.BitVector;
 
-import java.util.ArrayList;
-
 /**
  * A SAT encoding based on a "regular" encoding for actions and classical frame axioms
  * This encoding is based on chapter 7 of "Automated Planning: theory and practice", from Malik Ghallab, Dana Nau and Paolo Traverso, published by Morgan Kaufmann in 2004.
