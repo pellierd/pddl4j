@@ -1,12 +1,8 @@
 package fr.uga.pddl4j.planners.sat.encodings;
 
-import fr.uga.pddl4j.plan.Plan;
-import fr.uga.pddl4j.plan.SequentialPlan;
-import fr.uga.pddl4j.problem.operator.Action;
 import fr.uga.pddl4j.problem.operator.ConditionalEffect;
 import fr.uga.pddl4j.util.BitVector;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 /**
@@ -92,7 +88,6 @@ public class BitwiseClassicalSATEncoding extends AbstractSATEncoding {
             }
         }
 
-        //TODO : vérifier si c'est utile
         for (int nonexistentActionIndex = getProblem().getActions().size(); nonexistentActionIndex < (2 << (numberBits - 1)); nonexistentActionIndex++) {
             ArrayList<Boolean> encoding = getBitwiseEncodingOfAction(nonexistentActionIndex);
             for (int bit = 0; bit < numberBits; bit++) {
