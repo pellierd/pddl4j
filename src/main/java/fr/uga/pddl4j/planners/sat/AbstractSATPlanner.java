@@ -1,3 +1,18 @@
+/*
+ * Copyright (c) 2021 by Damien Pellier <Damien.Pellier@imag.fr>.
+ *
+ * This file is part of PDDL4J library.
+ *
+ * PDDL4J is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ *
+ * PDDL4J is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with PDDL4J.  If not, see
+ * <http://www.gnu.org/licenses/>
+ */
+
 package fr.uga.pddl4j.planners.sat;
 
 import com.github.liveontologies.ipasir4j.IpasirSolver;
@@ -9,7 +24,11 @@ import fr.uga.pddl4j.planners.AbstractPlanner;
 import fr.uga.pddl4j.planners.Planner;
 import fr.uga.pddl4j.planners.PlannerConfiguration;
 import fr.uga.pddl4j.planners.ProblemNotSupportedException;
-import fr.uga.pddl4j.planners.sat.encodings.*;
+import fr.uga.pddl4j.planners.sat.encodings.BitwiseClassicalSATEncoding;
+import fr.uga.pddl4j.planners.sat.encodings.RegularClassicalSATEncoding;
+import fr.uga.pddl4j.planners.sat.encodings.RegularExplanatorySATEncoding;
+import fr.uga.pddl4j.planners.sat.encodings.SATEncoding;
+import fr.uga.pddl4j.planners.sat.encodings.SimpleSplittingClassicalSATEncoding;
 import fr.uga.pddl4j.planners.sat.solvers.MergesatWrapper;
 import fr.uga.pddl4j.planners.sat.solvers.PicosatWrapper;
 import fr.uga.pddl4j.problem.DefaultProblem;
@@ -17,7 +36,7 @@ import fr.uga.pddl4j.problem.Problem;
 import picocli.CommandLine;
 
 /**
- * An abstract class defining all general elements of SAT planners
+ * An abstract class defining all general elements of SAT planners.
  */
 @CommandLine.Command(name = "AbstractSATPlanner",
     version = "AbstractSATPlanner 1.0",
@@ -31,66 +50,55 @@ import picocli.CommandLine;
     optionListHeading = "%nOptions:%n")
 public abstract class AbstractSATPlanner extends AbstractPlanner implements SATPlanner {
     /**
-     * The configuration property used to specify the SAT encoding
-     */
-    public static final String SAT_ENCODING_SETTING = "SAT_ENCODING";
-
-    /**
-     * The name of the default SAT encoding
-     */
-    public static final String DEFAULT_SAT_ENCODING_NAME = "DEFAULT";
-
-    /**
-     * The name of the chosen SAT encoding
+     * The name of the chosen SAT encoding.
      */
     private String encodingName;
 
     /**
-     * The configuration property used to specify the SAT solver
-     */
-    public static final String SAT_SOLVER_SETTING = "SAT_SOLVER";
-
-    /**
-     * The name of the default SAT solver
-     */
-    public static final String DEFAULT_SAT_SOLVER_NAME = "MERGESAT";
-
-    /**
-     * The name of the chosen SAT solver
+     * The name of the chosen SAT solver.
      */
     private String solverName;
 
     /**
-     * The configuration property used to specify the maximum length of a plan (that is, its number of actions)
-     */
-    public static final String  MAX_PLAN_LENGTH_SETTING = "MAX_PLAN_LENGTH";
-
-    /**
-     * The default maximum plan length
-     */
-    public static final int DEFAULT_MAX_PLAN_LENGTH = 1000;
-
-    /**
-     * The chosen maximum plan length
+     * The chosen maximum plan length.
      */
     private int maxPlanLength = -1;
 
     /**
-     * Creates a new SAT planner with the default configuration
+     * Creates a new SAT planner with the default configuration.
      */
     public AbstractSATPlanner() {
         this(AbstractSATPlanner.getDefaultConfiguration());
     }
 
     /**
-     * Creates a new SAT planner with the specified configuration
-     * @param configuration     the configuration of the planner
+     * Creates a new SAT planner with the specified configuration.
+     *
+     * @param configuration the configuration of the planner
      */
     public AbstractSATPlanner(final PlannerConfiguration configuration) {
         super();
         this.setConfiguration(configuration);
     }
 
+    /**
+     * Returns the default configuration of the planner.
+     * @return the default configuration of the planner
+     */
+    public static PlannerConfiguration getDefaultConfiguration() {
+        PlannerConfiguration config = Planner.getDefaultConfiguration();
+        config.setProperty(SAT_ENCODING_SETTING, DEFAULT_SAT_ENCODING_NAME);
+        config.setProperty(SAT_SOLVER_SETTING, DEFAULT_SAT_SOLVER_NAME);
+        config.setProperty(MAX_PLAN_LENGTH_SETTING, DEFAULT_MAX_PLAN_LENGTH);
+        return config;
+    }
+
+    /**
+     * Instantiates the planning problem from a parsed problem.
+     *
+     * @param problem the problem to instantiate.
+     * @return the instantiated planning problem or null if the problem cannot be instantiated.
+     */
     @Override
     public Problem instantiate(DefaultParsedProblem problem) {
         final Problem pb = new DefaultProblem(problem);
@@ -99,18 +107,21 @@ public abstract class AbstractSATPlanner extends AbstractPlanner implements SATP
     }
 
     /**
-     * Sets the encoding used by the planner
-     * @param encodingName  the name of the chosen encoding
+     * Sets the encoding used by the planner.
+     *
+     * @param encodingName the name of the chosen encoding
      */
     @CommandLine.Option(names = {"-e", "--encoding"}, defaultValue = "DEFAULT",
-        paramLabel = "<encoding>", description = "Sets the encoding used to encode the problem into a SAT problem (preset DEFAULT).")
+        paramLabel = "<encoding>", description = "Sets the encoding used to encode the problem into a SAT problem"
+        + "(preset DEFAULT).")
     public void setEncoding(String encodingName) {
         this.encodingName = encodingName;
     }
 
     /**
-     * Sets the solver used by the planner
-     * @param solverName    the name of the chosen solver
+     * Sets the solver used by the planner.
+     *
+     * @param solverName the name of the chosen solver
      */
     @CommandLine.Option(names = {"-s", "--solver"}, defaultValue = "MERGESAT",
         paramLabel = "<solver>", description = "Sets the SAT solver used to solve the problem (preset MERGESAT).")
@@ -119,36 +130,47 @@ public abstract class AbstractSATPlanner extends AbstractPlanner implements SATP
     }
 
     /**
-     * @return  the name of the encoding used by the planner
+     * Returns the name of the encoding.
+     * @return the name of the encoding used by the planner.
      */
     public String getEncodingName() {
         return encodingName;
     }
 
     /**
-     * @return  the name of the solver used by the planner
+     * Returns the name of the solver.
+     * @return the name of the solver used by the planner
      */
     public String getSolverName() {
         return solverName;
     }
 
     /**
-     * @return  the maximum length of a plan searched for by the planner
+     * Returns the maximum length of a plan searched for by the planner.
+     * @return the maximum length of a plan searched for by the planner
      */
     public int getMaxPlanLength() {
         return maxPlanLength;
     }
 
     /**
-     * Sets the maximum length of a plan searched for by the planner
-     * @param maxPlanLength     the chosen maximum length
+     * Sets the maximum length of a plan searched for by the planner.
+     *
+     * @param maxPlanLength the chosen maximum length
      */
     @CommandLine.Option(names = {"-mpl", "--maxPlanLength"}, defaultValue = "1000",
-        paramLabel = "<maxPlanLength>", description = "Sets the maximum length of a plan (maximum number of actions), after which the search for a solution is aborted.")
+        paramLabel = "<maxPlanLength>", description = "Sets the maximum length of a plan (maximum number of actions),"
+        + "after which the search for a solution is aborted.")
     public void setMaxPlanLength(int maxPlanLength) {
         this.maxPlanLength = Math.max(maxPlanLength, 0);
     }
 
+    /**
+     * Search a solution plan to a specified domain and problem using A*.
+     *
+     * @param problem the problem to solve.
+     * @return the plan found or null if no plan was found.
+     */
     @Override
     public Plan solve(Problem problem) throws ProblemNotSupportedException {
         SATEncoding encoding = getSATEncodingFromName(encodingName);
@@ -162,9 +184,10 @@ public abstract class AbstractSATPlanner extends AbstractPlanner implements SATP
     }
 
     /**
-     * @param encodingName                      the name of the encoding
-     * @return                                  a new instance of the corresponding encoding
-     * @throws ProblemNotSupportedException     if no such encoding exists
+     * Returns a new instance of the SAT encoding using the encoding name provided as argument.
+     * @param encodingName the name of the encoding
+     * @return a new instance of the corresponding encoding
+     * @throws ProblemNotSupportedException if no such encoding exists
      */
     public SATEncoding getSATEncodingFromName(String encodingName) throws ProblemNotSupportedException {
         switch (this.encodingName) {
@@ -187,9 +210,10 @@ public abstract class AbstractSATPlanner extends AbstractPlanner implements SATP
     }
 
     /**
-     * @param solverName                        the name of the solver
-     * @return                                  a new instance of the corresponding solver
-     * @throws ProblemNotSupportedException     if no such solver exists
+     * Returns a new instance of the SAT solver using the solver name provided as argument.
+     * @param solverName the name of the solver
+     * @return a new instance of the corresponding solver
+     * @throws ProblemNotSupportedException if no such solver exists
      */
     public IpasirSolver getSATSolverFromName(String solverName) throws ProblemNotSupportedException {
         switch (this.solverName) {
@@ -202,6 +226,12 @@ public abstract class AbstractSATPlanner extends AbstractPlanner implements SATP
         }
     }
 
+    /**
+     * Returns if a specified problem is supported by the planner. Just ADL problem can be solved by this planner.
+     *
+     * @param problem the problem to test.
+     * @return <code>true</code> if the problem is supported <code>false</code> otherwise.
+     */
     @Override
     public boolean isSupported(Problem problem) {
         return !(problem.getRequirements().contains(RequireKey.ACTION_COSTS)
@@ -220,6 +250,10 @@ public abstract class AbstractSATPlanner extends AbstractPlanner implements SATP
             || problem.getRequirements().contains(RequireKey.HIERARCHY));
     }
 
+    /**
+     * Returns true if the solver name is valid, else false.
+     * @return  true if the solver name is valid, else false
+     */
     public boolean hasValidSolver() {
         try {
             getSATSolverFromName(solverName);
@@ -229,6 +263,10 @@ public abstract class AbstractSATPlanner extends AbstractPlanner implements SATP
         return true;
     }
 
+    /**
+     * Returns <code>true</code> if the encoding name is valid, else <code>false</code>.
+     * @return  <code>true</code> if the encoding name is valid, else <code>false</code>
+     */
     public boolean hasValidEncoding() {
         try {
             getSATEncodingFromName(encodingName);
@@ -239,7 +277,8 @@ public abstract class AbstractSATPlanner extends AbstractPlanner implements SATP
     }
 
     /**
-     * @return  true if the configuration of the planner is valid, else false
+     * Returns <code>true</code> if the configuration of the planner is valid, else <code>false</code>.
+     * @return <code>true</code> if the configuration of the planner is valid, else <code>false</code>.
      */
     public boolean hasValidConfiguration() {
         return super.hasValidConfiguration()
@@ -249,16 +288,10 @@ public abstract class AbstractSATPlanner extends AbstractPlanner implements SATP
     }
 
     /**
-     * @return  the default configuration of the planner
+     * Returns the configuration of the planner.
+     *
+     * @return the configuration of the planner.
      */
-    public static PlannerConfiguration getDefaultConfiguration() {
-        PlannerConfiguration config = Planner.getDefaultConfiguration();
-        config.setProperty(SAT_ENCODING_SETTING, DEFAULT_SAT_ENCODING_NAME);
-        config.setProperty(SAT_SOLVER_SETTING, DEFAULT_SAT_SOLVER_NAME);
-        config.setProperty(MAX_PLAN_LENGTH_SETTING, DEFAULT_MAX_PLAN_LENGTH);
-        return config;
-    }
-
     @Override
     public PlannerConfiguration getConfiguration() {
         final PlannerConfiguration config = super.getConfiguration();
@@ -268,41 +301,50 @@ public abstract class AbstractSATPlanner extends AbstractPlanner implements SATP
         return config;
     }
 
+    /**
+     * Sets the configuration of the planner. If a planner setting is not defined in
+     * the specified configuration, the setting is initialized with its default value.
+     *
+     * @param configuration the configuration to set.
+     */
     @Override
     public void setConfiguration(final PlannerConfiguration configuration) {
         super.setConfiguration(configuration);
 
         if (configuration.getProperty(SAT_ENCODING_SETTING) == null) {
             setEncoding(DEFAULT_SAT_ENCODING_NAME);
-        }
-        else {
+        } else {
             setEncoding(configuration.getProperty(SAT_ENCODING_SETTING));
         }
 
         if (configuration.getProperty(SAT_SOLVER_SETTING) == null) {
             setSolver(DEFAULT_SAT_SOLVER_NAME);
-        }
-        else {
+        } else {
             setSolver(configuration.getProperty(SAT_SOLVER_SETTING));
         }
 
         if (configuration.getProperty(MAX_PLAN_LENGTH_SETTING) == null) {
             setMaxPlanLength(DEFAULT_MAX_PLAN_LENGTH);
-        }
-        else {
+        } else {
             setMaxPlanLength(Integer.parseInt(configuration.getProperty(MAX_PLAN_LENGTH_SETTING)));
         }
     }
+
     /**
+     * Returns <code>true</code> if the object passed as argument is equal to <code>this</code>, else
+     * <code>false</code>.
      * Two SAT planners are supposed equal iff :
-     *  - either they are the same object
-     *  - or they are instances of the same class, and have the same configuration
-     * @param obj   the compared object
-     * @return      whether they are the same SAT planner or not
+     * - either they are the same object
+     * - or they are instances of the same class, and have the same configuration
+     *
+     * @param obj the compared object
+     * @return whether they are the same SAT planner or not
      */
     @Override
     public boolean equals(Object obj) {
-        if (obj == this) return true;
+        if (obj == this) {
+            return true;
+        }
         if (obj != null && obj.getClass() == getClass()) {
             AbstractSATPlanner other = (AbstractSATPlanner) obj;
             return other.getConfiguration().equals(getConfiguration());
