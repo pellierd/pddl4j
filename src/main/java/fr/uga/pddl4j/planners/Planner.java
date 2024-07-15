@@ -113,7 +113,7 @@ public interface Planner extends Serializable, Callable<Integer> {
         PFD,
 
         /**
-         * SAT planner, using a SAT solver
+         * SAT planner, using a SAT solver.
          */
         SAT,
     }

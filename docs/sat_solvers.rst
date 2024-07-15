@@ -140,6 +140,9 @@ This part guides you in adding `mergesat <https://github.com/conp-solutions/merg
 
 And that's it!
 
+.. note::
+    If you have difficulties compiling the solver following the instructions above, you may also find a pre-compiled version of MergeSat that you may download :download:`here <http://pddl4j.imag.fr/repository/ressources/libmergesat.so>` and put it in the ``lib`` directory in your project. Please note that it has been compiled on a **Debian GNU/Linux x86_64** system and may not work on all systems.
+
 **General instructions for other solvers (optional)**
 
 This part presents a general overview of how you may add another solver. If you are satisfied with the MergeSat solver, you may skip this and go to the next step.
