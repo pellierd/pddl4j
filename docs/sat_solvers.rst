@@ -214,7 +214,7 @@ Then, you may use the provided classes this way (it will use MergeSat and the de
 .. code-block:: bash
 
            java -cp classes:lib/pddl4j-4.0.0.jar \
-                   fr.uga.pddl4j.planners.sat.SATPlannerExample \
+                   fr.uga.pddl4j.examples.sat.SATPlannerExample \
                    path/to/domain.pddl \
                    path/to/problem.pddl
 
@@ -223,7 +223,7 @@ Or, if you want to specify the solver (``-s MERGESAT``, for example), the encodi
 .. code-block:: bash
 
            java -cp classes:lib/pddl4j-4.0.0.jar \
-                   fr.uga.pddl4j.planners.sat.SATPlannerExample \
+                   fr.uga.pddl4j.examples.sat.SATPlannerExample \
                    path/to/domain.pddl \
                    path/to/problem.pddl \
                    -s MERGESAT \
