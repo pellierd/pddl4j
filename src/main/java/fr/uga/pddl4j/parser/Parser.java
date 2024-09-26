@@ -282,8 +282,7 @@ public final class Parser implements Callable<Integer> {
         lexer.setFile(this.getDomainFile());
         try {
             this.domain = this.lexer.domain();
-        } catch (ParseException e) {
-            e.printStackTrace();
+        } catch (Throwable e) {
             return null;
         }
         if (this.domain == null) {
@@ -370,8 +369,7 @@ public final class Parser implements Callable<Integer> {
         this.lexer.setFile(this.getProblemFile());
         try {
             this.problem = this.lexer.problem();
-        } catch (ParseException e) {
-            e.printStackTrace();
+        } catch (Throwable e) {
             return null;
         }
         if (this.problem == null || this.domain == null) {
