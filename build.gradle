@@ -3,7 +3,7 @@ buildscript {
         gradlePluginPortal()
     }
     configurations.all {
-        resolutionStrategy.force 'net.java.dev.javacc:javacc:6.2'
+        resolutionStrategy.force 'net.java.dev.javacc:javacc:7.0'
     }
 }
 
