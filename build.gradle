@@ -2,15 +2,13 @@ buildscript {
     repositories {
         gradlePluginPortal()
     }
-    configurations.all {
-        resolutionStrategy.force 'net.java.dev.javacc:javacc:7.0'
-    }
 }
 
 plugins {
-    id "ca.coglinc.javacc" version "2.4.0"
+    id "org.javacc.javacc"  version "3.0.2"
     id 'java'
     id "kr.motd.sphinx" version "2.10.0"
+
 }
 
 apply plugin: 'base'
@@ -19,8 +17,6 @@ apply plugin: 'checkstyle'
 
 group 'fr.uga'
 version '4.0.0'
-
-sourceCompatibility = 1.8
 
 repositories {
     mavenCentral()
